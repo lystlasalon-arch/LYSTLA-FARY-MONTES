@@ -1644,158 +1644,22 @@
         const DEMO_MODE = true;
 
 
+       
         /* =========================================
            30. CATÁLOGO DE SERVICIOS
+           CONECTADO A SUPABASE
         ========================================= */
 
-        const services = [
-
-            {
-                id: 'pedicure',
-                name: 'Pedicure con Gelish y Acripié',
-                description:
-                    'Cuidado y embellecimiento de los pies ' +
-                    'con acabado profesional, Gelish y Acripié.',
-                price: 0,
-                duration: null,
-                videoUrl: ''
-            },
-
-            {
-                id: 'manicure',
-                name: 'Manicure con Gelish',
-                description:
-                    'Cuidado de las manos y esmaltado Gelish ' +
-                    'para un acabado pulido y elegante.',
-                price: 0,
-                duration: null,
-                videoUrl: ''
-            },
-
-            {
-                id: 'cejas',
-                name: 'Planchado de ceja',
-                description:
-                    'Tratamiento para alinear, definir y estilizar ' +
-                    'las cejas con apariencia natural.',
-                price: 0,
-                duration: null,
-                videoUrl: ''
-            },
-
-            {
-                id: 'nanoplastia',
-                name: 'Nanoplastia orgánica sin formol',
-                description:
-                    'Tratamiento de alisado que ayuda a controlar ' +
-                    'el frizz y mejorar la apariencia del cabello.',
-                price: 0,
-                duration: null,
-                videoUrl: ''
-            },
-
-            {
-                id: 'capilares',
-                name: 'Tratamientos capilares',
-                description:
-                    'Cuidados personalizados de hidratación, ' +
-                    'suavidad y apariencia del cabello.',
-                price: 0,
-                duration: null,
-                videoUrl: ''
-            },
-
-            {
-                id: 'colorimetria',
-                name: 'Diseños de colorimetría',
-                description:
-                    'Coloraciones y efectos personalizados ' +
-                    'según el estilo y características del cabello.',
-                price: 0,
-                duration: null,
-                videoUrl: ''
-            },
-
-            {
-                id: 'maquillaje',
-                name: 'Maquillaje y peinados',
-                description:
-                    'Maquillaje y estilismo para eventos, ' +
-                    'celebraciones y ocasiones especiales.',
-                price: 0,
-                duration: null,
-                videoUrl: ''
-            },
-
-            {
-                id: 'cortes',
-                name: 'Cortes para dama, caballero y niños',
-                description:
-                    'Cortes personalizados según la edad, ' +
-                    'el estilo y las preferencias de cada cliente.',
-                price: 0,
-                duration: null,
-                videoUrl: ''
-            }
-
-        ];
+        let services = [];
 
 
         /* =========================================
            31. CATÁLOGO DE PRODUCTOS
-           FOTOGRAFÍAS PROVISIONALES
+           CONECTADO A SUPABASE
         ========================================= */
 
-        const products = [
-
-            {
-                id: 'demo-shampoo',
-                name: 'Shampoo profesional',
-                description:
-                    'Presentación ilustrativa. ' +
-                    'Fary podrá cambiar nombre, fotografía, ' +
-                    'descripción y precio.',
-                price: 0,
-                stock: 10,
-                demo: true,
-                image:
-                    'https://images.unsplash.com/' +
-                    'photo-1608248543803-ba4f8c70ae0b' +
-                    '?w=700&auto=format&fit=crop&q=80'
-            },
-
-            {
-                id: 'demo-tratamiento',
-                name: 'Tratamiento capilar',
-                description:
-                    'Producto demostrativo, pendiente de ' +
-                    'sustituir por el catálogo real.',
-                price: 0,
-                stock: 10,
-                demo: true,
-                image:
-                    'https://images.unsplash.com/' +
-                    'photo-1620916566398-39f1143ab7be' +
-                    '?w=700&auto=format&fit=crop&q=80'
-            },
-
-            {
-                id: 'demo-cosmetico',
-                name: 'Cuidado y belleza',
-                description:
-                    'Fotografía de referencia. ' +
-                    'Fary podrá cargar sus productos.',
-                price: 0,
-                stock: 10,
-                demo: true,
-                image:
-                    'https://images.unsplash.com/' +
-                    'photo-1596462502278-27bfdc403348' +
-                    '?w=700&auto=format&fit=crop&q=80'
-            }
-
-        ];
-
+        let products = [];
+ 
 
         /* =========================================
            32. PROMOCIONES
@@ -3402,11 +3266,184 @@ musicaLystla.addEventListener('pause', () => {
             }
 
         }
+
+        
+        /* =========================================
+           54. CARGAR SERVICIOS Y PRODUCTOS
+               DESDE SUPABASE
+        ========================================= */
+
+        async function cargarCatalogoTienda() {
+
+            const SUPABASE_URL =
+                'https://nwbkczxzgjsdwdnnizao.supabase.co';
+
+            const SUPABASE_ANON_KEY =
+                'sb_publishable_kIATMLB1KuEd9wpMT2eFDA_Z5w0uWen';
+
+
+            /* =====================================
+               01. CONSULTAR TABLA PÚBLICA
+            ===================================== */
+
+            async function consultarTabla(tabla) {
+
+                const respuesta = await fetch(
+                    `${SUPABASE_URL}/rest/v1/${tabla}?select=*&active=eq.true&order=created_at.desc`,
+                    {
+                        method: 'GET',
+
+                        headers: {
+                            apikey: SUPABASE_ANON_KEY
+                        }
+                    }
+                );
+
+
+                if (!respuesta.ok) {
+
+                    throw new Error(
+                        `Error al consultar ${tabla}: HTTP ${respuesta.status}`
+                    );
+
+                }
+
+
+                return await respuesta.json();
+
+            }
+
+
+            /* =====================================
+               02. CARGAR SERVICIOS
+            ===================================== */
+
+            try {
+
+                const registrosServicios =
+                    await consultarTabla(
+                        'lystla_services'
+                    );
+
+
+                services = registrosServicios.map((servicio) => {
+
+                    return {
+
+                        id: servicio.id,
+
+                        name: servicio.name,
+
+                        description:
+                            servicio.description || '',
+
+                        price: Number(
+                            servicio.price
+                        ),
+
+                        duration:
+                            servicio.duration,
+
+                        image: servicio.image_url || '',
+
+                        videoUrl:
+                            servicio.video_url || '',
+
+                        active:
+                            servicio.active !== false
+
+                    };
+
+                });
+
+
+                renderServices();
+
+
+                console.log(
+                    'Servicios de Lystla cargados:',
+                    services.length
+                );
+
+            } catch (error) {
+
+                console.error(
+                    'Error al cargar servicios:',
+                    error
+                );
+
+            }
+
+
+            /* =====================================
+               03. CARGAR PRODUCTOS
+            ===================================== */
+
+            try {
+
+                const registrosProductos =
+                    await consultarTabla(
+                        'lystla_products'
+                    );
+
+
+                products = registrosProductos.map((producto) => {
+
+                    return {
+
+                        id: producto.id,
+
+                        name: producto.name,
+
+                        description:
+                            producto.description || '',
+
+                        price: Number(
+                            producto.price
+                        ),
+
+                        stock: Number(
+                            producto.stock
+                        ),
+
+                        image:
+                            producto.image_url || '',
+
+                        videoUrl:
+                            producto.video_url || '',
+
+                        demo: false,
+
+                        active:
+                            producto.active !== false
+
+                    };
+
+                });
+
+
+                renderProducts();
+
+
+                console.log(
+                    'Productos de Lystla cargados:',
+                    products.length
+                );
+
+            } catch (error) {
+
+                console.error(
+                    'Error al cargar productos:',
+                    error
+                );
+
+            }
+
+        }
+
        
-
-
-
-               /* =========================================
+       
+        /* =========================================
            52. EJECUTAR APLICACIÓN
         ========================================= */
 
@@ -3414,40 +3451,11 @@ musicaLystla.addEventListener('pause', () => {
 
         cargarPromocionesTienda();
 
-        
-/* =========================================
-   REGISTRAR SERVICE WORKER
-   MAKEOVER SALON LYSTLA
-========================================= */
+        cargarCatalogoTienda();
 
-if ('serviceWorker' in navigator) {
 
-    window.addEventListener('load', async () => {
 
-        try {
-
-            const registro = await navigator.serviceWorker.register(
-                './service-worker.js'
-            );
-
-            console.log(
-                'Service Worker Lystla registrado:',
-                registro.scope
-            );
-
-        } catch (error) {
-
-            console.error(
-                'Error al registrar Service Worker:',
-                error
-            );
-
-        }
-
-    });
-
-}
-
+     
 
     </script>
 
