@@ -767,6 +767,44 @@
 
         }
 
+        
+/* =========================================
+   REPRODUCTOR DE MÚSICA LYSTLA
+========================================= */
+
+.music-button {
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+    z-index: 110;
+
+    width: 52px;
+    height: 52px;
+
+    border-radius: 50%;
+    border: 1px solid var(--champagne);
+
+    background: var(--plum);
+    color: white;
+
+    font-size: 21px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: var(--shadow);
+
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.music-button:hover {
+    background: #6c4b54;
+    transform: scale(1.06);
+}
+
+
 
         /* =========================================
            15. CELULARES
@@ -1540,6 +1578,30 @@
         hidden
         role="status"
     ></div>
+
+    
+<!-- =========================================
+     MÚSICA AMBIENTAL LYSTLA
+========================================= -->
+
+<audio
+    id="musica-lystla"
+    src="musica-estilista.mp3"
+    loop
+    preload="none"
+></audio>
+
+<button
+    type="button"
+    class="music-button"
+    id="music-button"
+    aria-label="Reproducir música"
+    aria-pressed="false"
+    title="Reproducir música"
+>
+    ♪
+</button>
+
 
 
     <!-- =========================================
@@ -3110,10 +3172,86 @@
 
         }
 
+        
+/* =========================================
+   CONTROL DE MÚSICA LYSTLA
+========================================= */
+
+const musicaLystla = document.getElementById(
+    'musica-lystla'
+);
+
+const botonMusica = document.getElementById(
+    'music-button'
+);
+
+botonMusica.addEventListener('click', async () => {
+
+    if (musicaLystla.paused) {
+
+        try {
+
+            await musicaLystla.play();
+
+        } catch (error) {
+
+            showToast(
+                'No se pudo reproducir la música.'
+            );
+
+        }
+
+    } else {
+
+        musicaLystla.pause();
+
+    }
+
+});
+
+musicaLystla.addEventListener('play', () => {
+
+    botonMusica.textContent = '♫';
+
+    botonMusica.title = 'Pausar música';
+
+    botonMusica.setAttribute(
+        'aria-label',
+        'Pausar música'
+    );
+
+    botonMusica.setAttribute(
+        'aria-pressed',
+        'true'
+    );
+
+});
+
+musicaLystla.addEventListener('pause', () => {
+
+    botonMusica.textContent = '♪';
+
+    botonMusica.title = 'Reproducir música';
+
+    botonMusica.setAttribute(
+        'aria-label',
+        'Reproducir música'
+    );
+
+    botonMusica.setAttribute(
+        'aria-pressed',
+        'false'
+    );
+
+});
+
+
 
         /* =========================================
            52. EJECUTAR APLICACIÓN
         ========================================= */
+
+        
 
         init();
 
