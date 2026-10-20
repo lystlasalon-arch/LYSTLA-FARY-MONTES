@@ -2383,8 +2383,10 @@
             }
 
 
+           
             /* =====================================
                EDITAR PROMOCIÓN
+               PRECIO Y FOTOGRAFÍA
             ===================================== */
 
             if (type === 'promotion') {
@@ -2397,7 +2399,7 @@
                 fields += fieldHTML(
                     'title',
                     'Título de la promoción',
-                    item.title,
+                    item.title || '',
                     'text',
                     true
                 );
@@ -2406,8 +2408,70 @@
                 fields += textareaHTML(
                     'description',
                     'Descripción',
-                    item.description
+                    item.description || ''
                 );
+
+
+                fields += fieldHTML(
+                    'promotional_price',
+                    'Precio promocional en pesos',
+                    item.promotional_price ?? '',
+                    'number',
+                    false
+                );
+
+
+                fields += `
+
+                    <div class="field">
+
+                        <label for="field-promotion-image">
+                            Fotografía de la promoción
+                        </label>
+
+                        <input
+                            id="field-promotion-image"
+                            name="promotion_image"
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                        >
+
+                        <p class="small muted">
+                            Formatos JPG, PNG o WEBP.
+                            Máximo 5 MB.
+                        </p>
+
+                    </div>
+
+                `;
+
+
+                if (item.image_url) {
+
+                    fields += `
+
+                        <div class="field">
+
+                            <label>
+                                Fotografía actual
+                            </label>
+
+                            <img
+                                src="${escapeHTML(item.image_url)}"
+                                alt="Fotografía de la promoción"
+                                style="
+                                    width: 100%;
+                                    max-width: 260px;
+                                    height: auto;
+                                    border-radius: 12px;
+                                "
+                            >
+
+                        </div>
+
+                    `;
+
+                }
 
 
                 fields += fieldHTML(
@@ -2462,7 +2526,6 @@
                 `;
 
             }
-
 
             /* =====================================
                EDITAR CITA
@@ -2629,9 +2692,24 @@
            45. GUARDAR FORMULARIO
         ========================================= */
 
-        function saveEditor(event) {
+      
+        async function saveEditor(event) {
 
             event.preventDefault();
+
+
+            /* =====================================
+               GUARDAR PROMOCIONES EN SUPABASE
+            ===================================== */
+
+            if (editorType === 'promotion') {
+
+                await guardarPromocionSupabase();
+
+                return;
+
+            }
+
 
 
             const form = new FormData(
@@ -3141,6 +3219,94 @@
             SUPABASE_ANON_KEY
         );
 
+        
+        /* =========================================
+           54. SUPABASE - CARGAR PROMOCIONES
+        ========================================= */
+
+        async function cargarPromocionesSupabase() {
+
+            try {
+
+                const { data: promociones, error } =
+                    await supabaseClient
+                        .from('lystla_promotions')
+                        .select('*')
+                        .order('created_at', {
+                            ascending: false
+                        });
+
+                if (error) {
+
+                    console.error(
+                        'Error al cargar promociones:',
+                        error
+                    );
+
+                    showToast(
+                        'No fue posible cargar las promociones.'
+                    );
+
+                    return false;
+
+                }
+
+                data.promotions = (promociones || []).map(
+                    (promocion) => {
+
+                        return {
+
+                            id: promocion.id,
+
+                            title: promocion.title,
+
+                            description:
+                                promocion.description || '',
+
+                            promotional_price:
+                                promocion.promotional_price,
+
+                            image_url:
+                                promocion.image_url || '',
+
+                            start:
+                                promocion.start_date,
+
+                            end:
+                                promocion.end_date,
+
+                            active:
+                                promocion.active
+
+                        };
+
+                    }
+                );
+
+                renderPromotions();
+
+                renderSummary();
+
+                return true;
+
+            } catch (error) {
+
+                console.error(
+                    'Error de conexión con promociones:',
+                    error
+                );
+
+                showToast(
+                    'Error de conexión con promociones.'
+                );
+
+                return false;
+
+            }
+
+        }
+
+
         let sessionCheck = 0;
 
         function showLogin(message = 'Inicia sesión para continuar.') {
@@ -3206,6 +3372,8 @@
                 }
 
                 showProtectedAdmin();
+
+                await cargarPromocionesSupabase();
 
             } catch (error) {
 
@@ -3278,6 +3446,418 @@
             }
 
         });
+
+        
+        /* =========================================
+           55. SUPABASE - GUARDAR PROMOCIONES
+        ========================================= */
+
+        async function guardarPromocionSupabase() {
+
+            const botonGuardar = document.querySelector(
+                '#editor-form button[type="submit"]'
+            );
+
+            const textoOriginal = botonGuardar.textContent;
+
+            let rutaImagenNueva = null;
+
+            let registroGuardado = false;
+
+            botonGuardar.disabled = true;
+
+            botonGuardar.textContent = 'Guardando...';
+
+
+            try {
+
+                /* =====================================
+                   01. OBTENER DATOS DEL FORMULARIO
+                ===================================== */
+
+                const formulario = $('editor-form');
+
+                const titulo = formulario.elements[
+                    'title'
+                ].value.trim();
+
+                const descripcion = formulario.elements[
+                    'description'
+                ].value.trim();
+
+                const precioTexto = formulario.elements[
+                    'promotional_price'
+                ].value.trim();
+
+                const inicio = formulario.elements[
+                    'start'
+                ].value;
+
+                const fin = formulario.elements[
+                    'end'
+                ].value;
+
+                const activa = formulario.elements[
+                    'active'
+                ].value === 'true';
+
+                const archivo = formulario.elements[
+                    'promotion_image'
+                ].files[0];
+
+
+                /* =====================================
+                   02. VALIDAR INFORMACIÓN
+                ===================================== */
+
+                if (
+                    !titulo ||
+                    !inicio ||
+                    !fin ||
+                    fin < inicio
+                ) {
+
+                    showToast(
+                        'Revisa el título y las fechas.'
+                    );
+
+                    return;
+
+                }
+
+
+                const precio = precioTexto === ''
+                    ? null
+                    : Number(precioTexto);
+
+
+                if (
+                    precio !== null &&
+                    (
+                        !Number.isFinite(precio) ||
+                        precio < 0
+                    )
+                ) {
+
+                    showToast(
+                        'El precio promocional no es válido.'
+                    );
+
+                    return;
+
+                }
+
+
+                /* =====================================
+                   03. VALIDAR FOTOGRAFÍA
+                ===================================== */
+
+                if (archivo) {
+
+                    const formatosPermitidos = [
+                        'image/jpeg',
+                        'image/png',
+                        'image/webp'
+                    ];
+
+                    if (
+                        !formatosPermitidos.includes(
+                            archivo.type
+                        )
+                    ) {
+
+                        showToast(
+                            'Utiliza una fotografía JPG, PNG o WEBP.'
+                        );
+
+                        return;
+
+                    }
+
+
+                    if (
+                        archivo.size > 5 * 1024 * 1024
+                    ) {
+
+                        showToast(
+                            'La fotografía supera los 5 MB.'
+                        );
+
+                        return;
+
+                    }
+
+                }
+
+
+                /* =====================================
+                   04. CONSULTAR PROMOCIÓN ANTERIOR
+                ===================================== */
+
+                const promocionAnterior = data.promotions.find(
+                    (promocion) => {
+
+                        return promocion.id === editorId;
+
+                    }
+                );
+
+                let imagenURL =
+                    promocionAnterior?.image_url || null;
+
+
+                /* =====================================
+                   05. SUBIR NUEVA FOTOGRAFÍA
+                ===================================== */
+
+                if (archivo) {
+
+                    const extensiones = {
+                        'image/jpeg': 'jpg',
+                        'image/png': 'png',
+                        'image/webp': 'webp'
+                    };
+
+                    const extension = extensiones[
+                        archivo.type
+                    ];
+
+                    const nombreArchivo =
+                        `${crypto.randomUUID()}.${extension}`;
+
+                    rutaImagenNueva = nombreArchivo;
+
+
+                    const { error: errorImagen } =
+                        await supabaseClient.storage
+                            .from('lystla-promotions')
+                            .upload(
+                                rutaImagenNueva,
+                                archivo,
+                                {
+                                    contentType: archivo.type,
+                                    upsert: false
+                                }
+                            );
+
+
+                    if (errorImagen) {
+
+                        throw errorImagen;
+
+                    }
+
+
+                    const { data: imagenPublica } =
+                        supabaseClient.storage
+                            .from('lystla-promotions')
+                            .getPublicUrl(
+                                rutaImagenNueva
+                            );
+
+
+                    imagenURL = imagenPublica.publicUrl;
+
+                }
+
+
+                /* =====================================
+                   06. PREPARAR REGISTRO
+                ===================================== */
+
+                const registro = {
+
+                    title: titulo,
+
+                    description: descripcion,
+
+                    promotional_price: precio,
+
+                    image_url: imagenURL,
+
+                    start_date: inicio,
+
+                    end_date: fin,
+
+                    active: activa
+
+                };
+
+
+                /* =====================================
+                   07. GUARDAR EN SUPABASE
+                ===================================== */
+
+                let resultado;
+
+
+                if (editorId) {
+
+                    resultado = await supabaseClient
+                        .from('lystla_promotions')
+                        .update(registro)
+                        .eq('id', editorId)
+                        .select('id')
+                        .single();
+
+                } else {
+
+                    resultado = await supabaseClient
+                        .from('lystla_promotions')
+                        .insert(registro)
+                        .select('id')
+                        .single();
+
+                }
+
+
+                if (resultado.error) {
+
+                    throw resultado.error;
+
+                }
+
+
+                registroGuardado = true;
+
+
+                /* =====================================
+                   08. ACTUALIZAR PANEL
+                ===================================== */
+
+                closeEditor();
+
+                const cargaCorrecta =
+                    await cargarPromocionesSupabase();
+
+
+                if (cargaCorrecta) {
+
+                    showToast(
+                        'Promoción guardada en Supabase.'
+                    );
+
+                } else {
+
+                    showToast(
+                        'Promoción guardada. Actualiza la lista.'
+                    );
+
+                }
+
+
+                /* =====================================
+                   09. ELIMINAR FOTOGRAFÍA REEMPLAZADA
+                ===================================== */
+
+                if (
+                    archivo &&
+                    promocionAnterior?.image_url &&
+                    promocionAnterior.image_url !== imagenURL
+                ) {
+
+                    const urlAnterior =
+                        promocionAnterior.image_url;
+
+                    const marcador =
+                        '/storage/v1/object/public/lystla-promotions/';
+
+
+                    if (urlAnterior.includes(marcador)) {
+
+                        const rutaAnterior = decodeURIComponent(
+                            urlAnterior
+                                .split(marcador)[1]
+                                .split('?')[0]
+                        );
+
+
+                        const { error: errorEliminar } =
+                            await supabaseClient.storage
+                                .from('lystla-promotions')
+                                .remove([
+                                    rutaAnterior
+                                ]);
+
+
+                        if (errorEliminar) {
+
+                            console.error(
+                                'Error al eliminar fotografía anterior:',
+                                errorEliminar
+                            );
+
+                            showToast(
+                                'Promoción guardada. No se pudo eliminar la fotografía anterior.'
+                            );
+
+                        }
+
+                    }
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    'Error al guardar promoción:',
+                    error
+                );
+
+
+                /* =====================================
+                   10. LIMPIAR FOTO SI FALLÓ GUARDADO
+                ===================================== */
+
+                if (
+                    rutaImagenNueva &&
+                    !registroGuardado
+                ) {
+
+                    const { error: errorLimpieza } =
+                        await supabaseClient.storage
+                            .from('lystla-promotions')
+                            .remove([
+                                rutaImagenNueva
+                            ]);
+
+
+                    if (errorLimpieza) {
+
+                        console.error(
+                            'No se pudo limpiar la fotografía:',
+                            errorLimpieza
+                        );
+
+                    }
+
+                }
+
+
+                if (registroGuardado) {
+
+                    showToast(
+                        'Promoción guardada. Revisa la actualización del panel.'
+                    );
+
+                } else {
+
+                    showToast(
+                        'No fue posible guardar la promoción.'
+                    );
+
+                }
+
+            } finally {
+
+                botonGuardar.disabled = false;
+
+                botonGuardar.textContent = textoOriginal;
+
+            }
+
+        }
+    
 
         checkAdminSession();
 
