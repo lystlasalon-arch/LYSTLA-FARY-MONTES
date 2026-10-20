@@ -1803,7 +1803,7 @@
 
         // Se mostrarán cuando agreguemos promociones activas.
 
-        const promotions = [];
+        let promotions = [];
 
 
         /* =========================================
@@ -2164,6 +2164,7 @@
         }
 
 
+      
         /* =========================================
            38. MOSTRAR PROMOCIONES
         ========================================= */
@@ -2192,9 +2193,50 @@
 
             $('promo-grid').innerHTML = activePromotions.map((promo) => {
 
+                const fotografia = promo.image_url
+                    ? `
+                        <img
+                            src="${safe(promo.image_url)}"
+                            alt="${safe(promo.title)}"
+                            loading="lazy"
+                            style="
+                                width: 100%;
+                                height: 240px;
+                                object-fit: cover;
+                                display: block;
+                            "
+                        >
+                    `
+                    : '';
+
+
+                const precio = (
+                    promo.promotional_price !== null &&
+                    promo.promotional_price !== undefined &&
+                    promo.promotional_price !== ''
+                )
+                    ? `
+                        <p style="
+                            font-size: 24px;
+                            font-weight: 700;
+                            margin-top: 12px;
+                        ">
+                            ${Number(
+                                promo.promotional_price
+                            ).toLocaleString('es-MX', {
+                                style: 'currency',
+                                currency: 'MXN'
+                            })}
+                        </p>
+                    `
+                    : '';
+
+
                 return `
 
                     <article class="card">
+
+                        ${fotografia}
 
                         <div class="card-body">
 
@@ -2210,6 +2252,8 @@
                                 ${safe(promo.description)}
                             </p>
 
+                            ${precio}
+
                         </div>
 
                     </article>
@@ -2219,6 +2263,7 @@
             }).join('');
 
         }
+
 
 
         /* =========================================
@@ -3261,15 +3306,113 @@ musicaLystla.addEventListener('pause', () => {
 
 });
 
-
-
+ 
         /* =========================================
+           53. CARGAR PROMOCIONES DESDE SUPABASE
+        ========================================= */
+
+        async function cargarPromocionesTienda() {
+
+            try {
+
+                const SUPABASE_URL =
+                    'https://nwbkczxzgjsdwdnnizao.supabase.co';
+
+                const SUPABASE_ANON_KEY =
+                    'sb_publishable_kIATMLB1KuEd9wpMT2eFDA_Z5w0uWen';
+
+
+                /* =====================================
+                   01. CONSULTAR PROMOCIONES
+                ===================================== */
+
+                const respuesta = await fetch(
+                    `${SUPABASE_URL}/rest/v1/lystla_promotions?select=*&active=eq.true`,
+                    {
+                        method: 'GET',
+
+                        headers: {
+                            apikey: SUPABASE_ANON_KEY
+                        }
+                    }
+                );
+
+
+                if (!respuesta.ok) {
+
+                    throw new Error(
+                        `Error HTTP ${respuesta.status}`
+                    );
+
+                }
+
+
+                const registros = await respuesta.json();
+
+
+                /* =====================================
+                   02. PREPARAR PROMOCIONES
+                ===================================== */
+
+                promotions = registros.map((promo) => {
+
+                    return {
+
+                        id: promo.id,
+
+                        title: promo.title,
+
+                        description: promo.description || '',
+
+                        promotional_price:
+                            promo.promotional_price,
+
+                        image_url: promo.image_url || '',
+
+                        start: promo.start_date,
+
+                        end: promo.end_date,
+
+                        active: promo.active
+
+                    };
+
+                });
+
+
+                /* =====================================
+                   03. ACTUALIZAR TIENDA
+                ===================================== */
+
+                renderPromotions();
+
+                console.log(
+                    'Promociones de Lystla cargadas:',
+                    promotions.length
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    'Error al cargar promociones de Lystla:',
+                    error
+                );
+
+            }
+
+        }
+       
+
+
+
+               /* =========================================
            52. EJECUTAR APLICACIÓN
         ========================================= */
 
-        
-
         init();
+
+        cargarPromocionesTienda();
 
         
 /* =========================================
