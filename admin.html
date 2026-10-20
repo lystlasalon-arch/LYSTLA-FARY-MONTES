@@ -1270,151 +1270,131 @@
         'use strict';
 
 
-        /* =========================================
-           28. CONFIGURACIÓN LOCAL
-        ========================================= */
+       
+/* =========================================
+   28. CONFIGURACIÓN LOCAL
+========================================= */
 
-        const STORAGE_KEY = 'lystla-admin-demo-v1';
-
-
-        const initialData = {
-
-            services: [
-
-                {
-                    id: 'pedicure',
-                    name: 'Pedicure con Gelish y Acripié',
-                    description: 'Cuidado profesional de los pies.',
-                    price: 0,
-                    duration: 60
-                },
-
-                {
-                    id: 'manicure',
-                    name: 'Manicure con Gelish',
-                    description: 'Cuidado de manos y esmaltado.',
-                    price: 0,
-                    duration: 60
-                },
-
-                {
-                    id: 'cejas',
-                    name: 'Planchado de ceja',
-                    description: 'Definición y estilizado de cejas.',
-                    price: 0,
-                    duration: 45
-                },
-
-                {
-                    id: 'nanoplastia',
-                    name: 'Nanoplastia orgánica sin formol',
-                    description: 'Tratamiento de alisado capilar.',
-                    price: 0,
-                    duration: 180
-                },
-
-                {
-                    id: 'capilares',
-                    name: 'Tratamientos capilares',
-                    description: 'Cuidado personalizado del cabello.',
-                    price: 0,
-                    duration: 90
-                },
-
-                {
-                    id: 'colorimetria',
-                    name: 'Diseños de colorimetría',
-                    description: 'Coloración y efectos personalizados.',
-                    price: 0,
-                    duration: 180
-                },
-
-                {
-                    id: 'maquillaje',
-                    name: 'Maquillaje y peinados',
-                    description: 'Preparación para ocasiones especiales.',
-                    price: 0,
-                    duration: 90
-                },
-
-                {
-                    id: 'cortes',
-                    name: 'Cortes para dama, caballero y niños',
-                    description: 'Cortes y estilismo personalizados.',
-                    price: 0,
-                    duration: 45
-                },
-
-                {
-                    id: 'corte-caballero',
-                    name: 'Corte para caballero',
-                    description: 'Servicio individual de corte.',
-                    price: 0,
-                    duration: 30
-                }
-
-            ],
-
-            products: [],
-
-            promotions: [],
-
-            appointments: [],
-
-            settings: {
-                phone: '',
-                open: '09:00',
-                close: '19:00',
-                reminders: '12:00, 20:00'
-            }
-
-        };
+const STORAGE_KEY = 'lystla-admin-demo-v1';
 
 
-        /* =========================================
-           29. CARGAR DATOS
-        ========================================= */
+const initialData = {
 
-        function loadData() {
+    services: [],
 
-            try {
+    products: [],
 
-                const saved = localStorage.getItem(
-                    STORAGE_KEY
-                );
+    promotions: [],
 
-                if (saved) {
+    appointments: [],
 
-                    const parsed = JSON.parse(saved);
+    settings: {
 
-                    if (
-                        Array.isArray(parsed.services) &&
-                        Array.isArray(parsed.products) &&
-                        Array.isArray(parsed.promotions) &&
-                        Array.isArray(parsed.appointments)
-                    ) {
+        phone: '',
 
-                        return parsed;
+        open: '09:00',
 
-                    }
+        close: '19:00',
+
+        reminders: '12:00, 20:00'
+
+    }
+
+};
+
+
+        
+/* =========================================
+   29. CARGAR DATOS
+========================================= */
+
+function loadData() {
+
+    const base = structuredClone(initialData);
+
+    try {
+
+        const saved = localStorage.getItem(
+            STORAGE_KEY
+        );
+
+        if (saved) {
+
+            const parsed = JSON.parse(saved);
+
+            if (
+                parsed &&
+                typeof parsed === 'object'
+            ) {
+
+                /*
+                   Los servicios, productos y promociones
+                   se cargarán desde Supabase.
+
+                   No recuperamos los catálogos antiguos
+                   guardados en el navegador.
+                */
+
+                base.services = [];
+
+                base.products = [];
+
+                base.promotions = [];
+
+
+                /*
+                   Conservamos las citas locales.
+                */
+
+                if (
+                    Array.isArray(parsed.appointments)
+                ) {
+
+                    base.appointments =
+                        parsed.appointments;
 
                 }
 
-            } catch (error) {
 
-                console.warn(
-                    'No fue posible leer los datos locales.',
-                    error
-                );
+                /*
+                   Conservamos la configuración local.
+                */
+
+                if (
+                    parsed.settings &&
+                    typeof parsed.settings === 'object'
+                ) {
+
+                    base.settings = {
+
+                        ...base.settings,
+
+                        ...parsed.settings
+
+                    };
+
+                }
 
             }
-
-            return structuredClone(initialData);
 
         }
 
+    } catch (error) {
 
-        let data = loadData();
+        console.warn(
+            'No fue posible leer los datos locales.',
+            error
+        );
+
+    }
+
+    return base;
+
+}
+
+
+let data = loadData();
+
 
 
         /* =========================================
