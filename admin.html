@@ -2250,6 +2250,7 @@
         }
 
 
+      
         /* =========================================
            43. ABRIR EDITOR
         ========================================= */
@@ -2290,7 +2291,7 @@
 
 
             /* =====================================
-               EDITAR SERVICIO
+               01. EDITAR SERVICIO
             ===================================== */
 
             if (type === 'service') {
@@ -2333,11 +2334,133 @@
                     true
                 );
 
+
+                /* =====================================
+                   FOTOGRAFÍA DEL SERVICIO
+                ===================================== */
+
+                fields += `
+
+                    <div class="field">
+
+                        <label for="field-service-image">
+                            Fotografía del servicio
+                        </label>
+
+                        <input
+                            id="field-service-image"
+                            name="service_image"
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                        >
+
+                        <p class="small muted">
+                            JPG, PNG o WEBP.
+                            Máximo 5 MB.
+                        </p>
+
+                    </div>
+
+                `;
+
+
+                /* =====================================
+                   VIDEO DEL SERVICIO
+                ===================================== */
+
+                fields += `
+
+                    <div class="field">
+
+                        <label for="field-service-video">
+                            Video demostrativo
+                        </label>
+
+                        <input
+                            id="field-service-video"
+                            name="service_video"
+                            type="file"
+                            accept="video/mp4,video/webm"
+                        >
+
+                        <p class="small muted">
+                            MP4 o WEBM.
+                            Máximo 30 MB.
+                        </p>
+
+                    </div>
+
+                `;
+
+
+                /* =====================================
+                   MOSTRAR FOTOGRAFÍA ACTUAL
+                ===================================== */
+
+                if (item.image_url) {
+
+                    fields += `
+
+                        <div class="field">
+
+                            <label>
+                                Fotografía actual
+                            </label>
+
+                            <img
+                                src="${escapeHTML(item.image_url)}"
+                                alt="Fotografía del servicio"
+                                style="
+                                    width: 100%;
+                                    max-width: 260px;
+                                    height: auto;
+                                    border-radius: 12px;
+                                "
+                            >
+
+                        </div>
+
+                    `;
+
+                }
+
+
+                /* =====================================
+                   MOSTRAR VIDEO ACTUAL
+                ===================================== */
+
+                if (item.video_url) {
+
+                    fields += `
+
+                        <div class="field">
+
+                            <label>
+                                Video actual
+                            </label>
+
+                            <video
+                                src="${escapeHTML(item.video_url)}"
+                                controls
+                                preload="metadata"
+                                style="
+                                    width: 100%;
+                                    max-width: 320px;
+                                    border-radius: 12px;
+                                "
+                            ></video>
+
+                        </div>
+
+                    `;
+
+                }
+
             }
 
 
             /* =====================================
-               EDITAR PRODUCTO
+               02. EDITAR PRODUCTO
             ===================================== */
 
             if (type === 'product') {
@@ -2380,12 +2503,133 @@
                     true
                 );
 
+
+                /* =====================================
+                   FOTOGRAFÍA DEL PRODUCTO
+                ===================================== */
+
+                fields += `
+
+                    <div class="field">
+
+                        <label for="field-product-image">
+                            Fotografía del producto
+                        </label>
+
+                        <input
+                            id="field-product-image"
+                            name="product_image"
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                        >
+
+                        <p class="small muted">
+                            JPG, PNG o WEBP.
+                            Máximo 5 MB.
+                        </p>
+
+                    </div>
+
+                `;
+
+
+                /* =====================================
+                   VIDEO DEL PRODUCTO
+                ===================================== */
+
+                fields += `
+
+                    <div class="field">
+
+                        <label for="field-product-video">
+                            Video del producto
+                        </label>
+
+                        <input
+                            id="field-product-video"
+                            name="product_video"
+                            type="file"
+                            accept="video/mp4,video/webm"
+                        >
+
+                        <p class="small muted">
+                            MP4 o WEBM.
+                            Máximo 30 MB.
+                        </p>
+
+                    </div>
+
+                `;
+
+
+                /* =====================================
+                   MOSTRAR FOTOGRAFÍA ACTUAL
+                ===================================== */
+
+                if (item.image_url) {
+
+                    fields += `
+
+                        <div class="field">
+
+                            <label>
+                                Fotografía actual
+                            </label>
+
+                            <img
+                                src="${escapeHTML(item.image_url)}"
+                                alt="Fotografía del producto"
+                                style="
+                                    width: 100%;
+                                    max-width: 260px;
+                                    height: auto;
+                                    border-radius: 12px;
+                                "
+                            >
+
+                        </div>
+
+                    `;
+
+                }
+
+
+                /* =====================================
+                   MOSTRAR VIDEO ACTUAL
+                ===================================== */
+
+                if (item.video_url) {
+
+                    fields += `
+
+                        <div class="field">
+
+                            <label>
+                                Video actual
+                            </label>
+
+                            <video
+                                src="${escapeHTML(item.video_url)}"
+                                controls
+                                preload="metadata"
+                                style="
+                                    width: 100%;
+                                    max-width: 320px;
+                                    border-radius: 12px;
+                                "
+                            ></video>
+
+                        </div>
+
+                    `;
+
+                }
+
             }
 
 
-           
             /* =====================================
-               EDITAR PROMOCIÓN
+               03. EDITAR PROMOCIÓN
                PRECIO Y FOTOGRAFÍA
             ===================================== */
 
@@ -2527,8 +2771,9 @@
 
             }
 
+
             /* =====================================
-               EDITAR CITA
+               04. EDITAR CITA
             ===================================== */
 
             if (type === 'appointment') {
@@ -2664,6 +2909,10 @@
             }
 
 
+            /* =====================================
+               05. MOSTRAR FORMULARIO
+            ===================================== */
+
             $('editor-title').textContent = title;
 
             $('editor-fields').innerHTML = fields;
@@ -2671,7 +2920,7 @@
             $('editor-modal').hidden = false;
 
         }
-
+ 
 
         /* =========================================
            44. CERRAR EDITOR
@@ -2688,18 +2937,19 @@
         }
 
 
+       
         /* =========================================
            45. GUARDAR FORMULARIO
+           LYSTLA - SUPABASE
         ========================================= */
 
-      
         async function saveEditor(event) {
 
             event.preventDefault();
 
 
             /* =====================================
-               GUARDAR PROMOCIONES EN SUPABASE
+               01. GUARDAR PROMOCIONES
             ===================================== */
 
             if (editorType === 'promotion') {
@@ -2711,6 +2961,25 @@
             }
 
 
+            /* =====================================
+               02. GUARDAR SERVICIOS Y PRODUCTOS
+            ===================================== */
+
+            if (
+                editorType === 'service' ||
+                editorType === 'product'
+            ) {
+
+                await guardarCatalogoSupabase();
+
+                return;
+
+            }
+
+
+            /* =====================================
+               03. CONSERVAR GUARDADO DE CITAS
+            ===================================== */
 
             const form = new FormData(
                 $('editor-form')
@@ -2753,99 +3022,7 @@
 
 
             /* =====================================
-               VALIDAR SERVICIO
-            ===================================== */
-
-            if (editorType === 'service') {
-
-                record.name = record.name.trim();
-
-                record.price = Number(record.price);
-
-                record.duration = Number(record.duration);
-
-
-                if (
-                    !record.name ||
-                    !Number.isFinite(record.price) ||
-                    record.price < 0 ||
-                    !Number.isInteger(record.duration) ||
-                    record.duration <= 0
-                ) {
-
-                    showToast(
-                        'Revisa nombre, precio y duración.'
-                    );
-
-                    return;
-
-                }
-
-            }
-
-
-            /* =====================================
-               VALIDAR PRODUCTO
-            ===================================== */
-
-            if (editorType === 'product') {
-
-                record.name = record.name.trim();
-
-                record.price = Number(record.price);
-
-                record.stock = Number(record.stock);
-
-
-                if (
-                    !record.name ||
-                    !Number.isFinite(record.price) ||
-                    record.price < 0 ||
-                    !Number.isInteger(record.stock) ||
-                    record.stock < 0
-                ) {
-
-                    showToast(
-                        'Revisa los datos del producto.'
-                    );
-
-                    return;
-
-                }
-
-            }
-
-
-            /* =====================================
-               VALIDAR PROMOCIÓN
-            ===================================== */
-
-            if (editorType === 'promotion') {
-
-                record.title = record.title.trim();
-
-                record.active =
-                    record.active === 'true';
-
-
-                if (
-                    !record.title ||
-                    record.end < record.start
-                ) {
-
-                    showToast(
-                        'Revisa las fechas de la promoción.'
-                    );
-
-                    return;
-
-                }
-
-            }
-
-
-            /* =====================================
-               VALIDAR CITA
+               04. VALIDAR CITA
             ===================================== */
 
             if (editorType === 'appointment') {
@@ -2908,7 +3085,7 @@
 
 
             /* =====================================
-               AGREGAR O ACTUALIZAR
+               05. GUARDAR CITA EN NAVEGADOR
             ===================================== */
 
             if (existing) {
@@ -2930,11 +3107,613 @@
 
                 closeEditor();
 
-                showToast('Cambios guardados en este navegador.');
+                showToast(
+                    'Cambios guardados en este navegador.'
+                );
 
             }
 
         }
+
+
+        /* =========================================
+           45.1. GUARDAR CATÁLOGO EN SUPABASE
+        ========================================= */
+
+        async function guardarCatalogoSupabase() {
+
+            const formulario = $('editor-form');
+
+            const botonGuardar = formulario.querySelector(
+                'button[type="submit"]'
+            );
+
+            const textoOriginal = botonGuardar
+                ? botonGuardar.textContent
+                : '';
+
+            const tipo = editorType;
+
+            const esServicio = tipo === 'service';
+
+            const tabla = esServicio
+                ? 'lystla_services'
+                : 'lystla_products';
+
+            const bucket = esServicio
+                ? 'lystla-services'
+                : 'lystla-products';
+
+            const coleccion = esServicio
+                ? 'services'
+                : 'products';
+
+            const prefijo = esServicio
+                ? 'service'
+                : 'product';
+
+            const archivosNuevos = [];
+
+            let guardadoCorrecto = false;
+
+
+            if (botonGuardar) {
+
+                botonGuardar.disabled = true;
+
+                botonGuardar.textContent = 'Guardando...';
+
+            }
+
+
+            try {
+
+                /* =====================================
+                   01. OBTENER INFORMACIÓN
+                ===================================== */
+
+                const nombre = formulario.elements[
+                    'name'
+                ].value.trim();
+
+                const descripcion = formulario.elements[
+                    'description'
+                ].value.trim();
+
+                const precio = Number(
+                    formulario.elements['price'].value
+                );
+
+                const imagen = formulario.elements[
+                    `${prefijo}_image`
+                ].files[0];
+
+                const video = formulario.elements[
+                    `${prefijo}_video`
+                ].files[0];
+
+
+                /* =====================================
+                   02. VALIDAR CAMPOS
+                ===================================== */
+
+                if (
+                    !nombre ||
+                    !Number.isFinite(precio) ||
+                    precio < 0
+                ) {
+
+                    showToast(
+                        'Revisa el nombre y el precio.'
+                    );
+
+                    return;
+
+                }
+
+
+                const registro = {
+
+                    name: nombre,
+
+                    description: descripcion,
+
+                    price: precio
+
+                };
+
+
+                if (esServicio) {
+
+                    const duracion = Number(
+                        formulario.elements[
+                            'duration'
+                        ].value
+                    );
+
+
+                    if (
+                        !Number.isInteger(duracion) ||
+                        duracion <= 0
+                    ) {
+
+                        showToast(
+                            'Revisa la duración del servicio.'
+                        );
+
+                        return;
+
+                    }
+
+
+                    registro.duration = duracion;
+
+                } else {
+
+                    const existencias = Number(
+                        formulario.elements[
+                            'stock'
+                        ].value
+                    );
+
+
+                    if (
+                        !Number.isInteger(existencias) ||
+                        existencias < 0
+                    ) {
+
+                        showToast(
+                            'Revisa las existencias del producto.'
+                        );
+
+                        return;
+
+                    }
+
+
+                    registro.stock = existencias;
+
+                }
+
+
+                /* =====================================
+                   03. VALIDAR ARCHIVOS
+                ===================================== */
+
+                const tiposImagen = [
+                    'image/jpeg',
+                    'image/png',
+                    'image/webp'
+                ];
+
+                const tiposVideo = [
+                    'video/mp4',
+                    'video/webm'
+                ];
+
+
+                if (imagen) {
+
+                    if (
+                        !tiposImagen.includes(imagen.type) ||
+                        imagen.size > 5 * 1024 * 1024
+                    ) {
+
+                        showToast(
+                            'La fotografía debe ser JPG, PNG o WEBP, máximo 5 MB.'
+                        );
+
+                        return;
+
+                    }
+
+                }
+
+
+                if (video) {
+
+                    if (
+                        !tiposVideo.includes(video.type) ||
+                        video.size > 30 * 1024 * 1024
+                    ) {
+
+                        showToast(
+                            'El video debe ser MP4 o WEBM, máximo 30 MB.'
+                        );
+
+                        return;
+
+                    }
+
+                }
+
+
+                /* =====================================
+                   04. OBTENER REGISTRO ANTERIOR
+                ===================================== */
+
+                let registroAnterior = null;
+
+
+                if (editorId) {
+
+                    const { data: anterior, error } =
+                        await supabaseClient
+                            .from(tabla)
+                            .select('*')
+                            .eq('id', editorId)
+                            .single();
+
+
+                    if (error) {
+
+                        throw error;
+
+                    }
+
+
+                    registroAnterior = anterior;
+
+                }
+
+
+                /* =====================================
+                   05. SUBIR ARCHIVOS
+                ===================================== */
+
+                async function subirArchivo(
+                    archivo,
+                    categoria
+                ) {
+
+                    if (!archivo) {
+
+                        return null;
+
+                    }
+
+
+                    const extensiones = {
+                        'image/jpeg': 'jpg',
+                        'image/png': 'png',
+                        'image/webp': 'webp',
+                        'video/mp4': 'mp4',
+                        'video/webm': 'webm'
+                    };
+
+
+                    const extension = extensiones[
+                        archivo.type
+                    ];
+
+                    const ruta = `${categoria}/${crypto.randomUUID()}.${extension}`;
+
+
+                    const { error } =
+                        await supabaseClient.storage
+                            .from(bucket)
+                            .upload(
+                                ruta,
+                                archivo,
+                                {
+                                    contentType: archivo.type,
+                                    upsert: false
+                                }
+                            );
+
+
+                    if (error) {
+
+                        throw error;
+
+                    }
+
+
+                    archivosNuevos.push(ruta);
+
+
+                    const { data: archivoPublico } =
+                        supabaseClient.storage
+                            .from(bucket)
+                            .getPublicUrl(ruta);
+
+
+                    return archivoPublico.publicUrl;
+
+                }
+
+
+                const nuevaImagen = await subirArchivo(
+                    imagen,
+                    'images'
+                );
+
+                const nuevoVideo = await subirArchivo(
+                    video,
+                    'videos'
+                );
+
+
+                /* =====================================
+                   06. PREPARAR MULTIMEDIA
+                ===================================== */
+
+                registro.image_url = nuevaImagen ||
+                    registroAnterior?.image_url ||
+                    null;
+
+                registro.video_url = nuevoVideo ||
+                    registroAnterior?.video_url ||
+                    null;
+
+
+                /* =====================================
+                   07. GUARDAR EN BASE DE DATOS
+                ===================================== */
+
+                let resultado;
+
+
+                if (editorId) {
+
+                    resultado = await supabaseClient
+                        .from(tabla)
+                        .update(registro)
+                        .eq('id', editorId)
+                        .select('*')
+                        .single();
+
+                } else {
+
+                    resultado = await supabaseClient
+                        .from(tabla)
+                        .insert(registro)
+                        .select('*')
+                        .single();
+
+                }
+
+
+                if (resultado.error) {
+
+                    throw resultado.error;
+
+                }
+
+
+                guardadoCorrecto = true;
+
+
+                /* =====================================
+                   08. ACTUALIZAR DATOS DEL PANEL
+                ===================================== */
+
+                const registroGuardado = resultado.data;
+
+                const nuevoElemento = {
+
+                    id: registroGuardado.id,
+
+                    name: registroGuardado.name,
+
+                    description:
+                        registroGuardado.description || '',
+
+                    price: Number(
+                        registroGuardado.price
+                    ),
+
+                    image_url:
+                        registroGuardado.image_url || '',
+
+                    video_url:
+                        registroGuardado.video_url || '',
+
+                    active:
+                        registroGuardado.active !== false
+
+                };
+
+
+                if (esServicio) {
+
+                    nuevoElemento.duration =
+                        registroGuardado.duration;
+
+                } else {
+
+                    nuevoElemento.stock =
+                        registroGuardado.stock;
+
+                }
+
+
+                const lista = data[coleccion];
+
+                const posicion = lista.findIndex(
+                    (item) => item.id === nuevoElemento.id
+                );
+
+
+                if (posicion >= 0) {
+
+                    lista[posicion] = nuevoElemento;
+
+                } else {
+
+                    lista.push(nuevoElemento);
+
+                }
+
+
+                saveData();
+
+                closeEditor();
+
+
+                showToast(
+                    esServicio
+                        ? 'Servicio guardado en Supabase.'
+                        : 'Producto guardado en Supabase.'
+                );
+
+
+                /* =====================================
+                   09. ELIMINAR ARCHIVOS REEMPLAZADOS
+                ===================================== */
+
+                const archivosAnteriores = [];
+
+
+                function obtenerRutaAnterior(url) {
+
+                    if (!url) {
+
+                        return null;
+
+                    }
+
+
+                    const marcador =
+                        `/storage/v1/object/public/${bucket}/`;
+
+
+                    if (!url.includes(marcador)) {
+
+                        return null;
+
+                    }
+
+
+                    return decodeURIComponent(
+                        url.split(marcador)[1]
+                            .split('?')[0]
+                    );
+
+                }
+
+
+                if (
+                    nuevaImagen &&
+                    registroAnterior?.image_url
+                ) {
+
+                    const rutaAnterior = obtenerRutaAnterior(
+                        registroAnterior.image_url
+                    );
+
+
+                    if (rutaAnterior) {
+
+                        archivosAnteriores.push(
+                            rutaAnterior
+                        );
+
+                    }
+
+                }
+
+
+                if (
+                    nuevoVideo &&
+                    registroAnterior?.video_url
+                ) {
+
+                    const rutaAnterior = obtenerRutaAnterior(
+                        registroAnterior.video_url
+                    );
+
+
+                    if (rutaAnterior) {
+
+                        archivosAnteriores.push(
+                            rutaAnterior
+                        );
+
+                    }
+
+                }
+
+
+                if (archivosAnteriores.length > 0) {
+
+                    const { error: errorEliminar } =
+                        await supabaseClient.storage
+                            .from(bucket)
+                            .remove(archivosAnteriores);
+
+
+                    if (errorEliminar) {
+
+                        console.error(
+                            'No se pudieron eliminar los archivos anteriores:',
+                            errorEliminar
+                        );
+
+                        showToast(
+                            'Registro guardado. No se pudieron eliminar algunos archivos anteriores.'
+                        );
+
+                    }
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    'Error al guardar catálogo Lystla:',
+                    error
+                );
+
+
+                /* =====================================
+                   10. LIMPIAR ARCHIVOS NUEVOS
+                   SI FALLA EL GUARDADO
+                ===================================== */
+
+                if (
+                    !guardadoCorrecto &&
+                    archivosNuevos.length > 0
+                ) {
+
+                    const { error: errorLimpieza } =
+                        await supabaseClient.storage
+                            .from(bucket)
+                            .remove(archivosNuevos);
+
+
+                    if (errorLimpieza) {
+
+                        console.error(
+                            'Error al limpiar archivos:',
+                            errorLimpieza
+                        );
+
+                    }
+
+                }
+
+
+                showToast(
+                    guardadoCorrecto
+                        ? 'Registro guardado. Revisa la actualización del panel.'
+                        : 'No fue posible guardar. Revisa la consola.'
+                );
+
+            } finally {
+
+                if (botonGuardar) {
+
+                    botonGuardar.disabled = false;
+
+                    botonGuardar.textContent = textoOriginal;
+
+                }
+
+            }
+
+        }
+
 
 
         /* =========================================
@@ -3371,9 +4150,11 @@
                     return;
                 }
 
-                showProtectedAdmin();
+                       showProtectedAdmin();
 
-                await cargarPromocionesSupabase();
+        await cargarPromocionesSupabase();
+
+        await cargarCatalogoSupabase();
 
             } catch (error) {
 
@@ -3857,6 +4638,175 @@
             }
 
         }
+
+       
+        /* =========================================
+           56. CARGAR SERVICIOS Y PRODUCTOS
+               DESDE SUPABASE
+        ========================================= */
+
+        async function cargarCatalogoSupabase() {
+
+            try {
+
+                /* =====================================
+                   01. CONSULTAR SERVICIOS
+                ===================================== */
+
+                const resultadoServicios =
+                    await supabaseClient
+                        .from('lystla_services')
+                        .select('*')
+                        .order('created_at', {
+                            ascending: false
+                        });
+
+
+                if (resultadoServicios.error) {
+
+                    throw resultadoServicios.error;
+
+                }
+
+
+                /* =====================================
+                   02. CONSULTAR PRODUCTOS
+                ===================================== */
+
+                const resultadoProductos =
+                    await supabaseClient
+                        .from('lystla_products')
+                        .select('*')
+                        .order('created_at', {
+                            ascending: false
+                        });
+
+
+                if (resultadoProductos.error) {
+
+                    throw resultadoProductos.error;
+
+                }
+
+
+                /* =====================================
+                   03. PREPARAR SERVICIOS
+                ===================================== */
+
+                data.services = (
+                    resultadoServicios.data || []
+                ).map((servicio) => {
+
+                    return {
+
+                        id: servicio.id,
+
+                        name: servicio.name,
+
+                        description:
+                            servicio.description || '',
+
+                        price: Number(
+                            servicio.price
+                        ),
+
+                        duration:
+                            servicio.duration,
+
+                        image_url:
+                            servicio.image_url || '',
+
+                        video_url:
+                            servicio.video_url || '',
+
+                        active:
+                            servicio.active !== false
+
+                    };
+
+                });
+
+
+                /* =====================================
+                   04. PREPARAR PRODUCTOS
+                ===================================== */
+
+                data.products = (
+                    resultadoProductos.data || []
+                ).map((producto) => {
+
+                    return {
+
+                        id: producto.id,
+
+                        name: producto.name,
+
+                        description:
+                            producto.description || '',
+
+                        price: Number(
+                            producto.price
+                        ),
+
+                        stock:
+                            producto.stock,
+
+                        image_url:
+                            producto.image_url || '',
+
+                        video_url:
+                            producto.video_url || '',
+
+                        active:
+                            producto.active !== false
+
+                    };
+
+                });
+
+
+                /* =====================================
+                   05. ACTUALIZAR ADMINISTRADOR
+                ===================================== */
+
+                renderServices();
+
+                renderProducts();
+
+                renderSummary();
+
+
+                console.log(
+                    'Servicios cargados:',
+                    data.services.length
+                );
+
+                console.log(
+                    'Productos cargados:',
+                    data.products.length
+                );
+
+
+                return true;
+
+            } catch (error) {
+
+                console.error(
+                    'Error al cargar catálogo de Lystla:',
+                    error
+                );
+
+                showToast(
+                    'No fue posible cargar servicios y productos.'
+                );
+
+
+                return false;
+
+            }
+
+        }
+ 
     
 
         checkAdminSession();
