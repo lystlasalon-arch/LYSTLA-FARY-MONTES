@@ -1,0 +1,5011 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#fbf7f2"
+    >
+
+    <title>
+        Lystla | Administración
+    </title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600&display=swap"
+        rel="stylesheet"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+
+        /* =========================================
+           01. COLORES Y VARIABLES
+        ========================================= */
+
+        :root {
+            --ivory: #fbf7f2;
+            --white: #ffffff;
+            --blush: #eed8d7;
+            --gold: #d6b58a;
+            --mauve: #b8a0a9;
+            --plum: #443237;
+            --muted: #85747a;
+            --border: #e9dcd3;
+            --danger: #a84e57;
+            --shadow: 0 10px 30px rgba(68, 50, 55, 0.08);
+        }
+
+
+        /* =========================================
+           02. ESTILOS GENERALES
+        ========================================= */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--ivory);
+            color: var(--plum);
+            font-family: 'Jost', Arial, sans-serif;
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        .container {
+            width: min(1200px, calc(100% - 28px));
+            margin: auto;
+        }
+
+        .serif {
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        .small {
+            font-size: 12px;
+        }
+
+
+        /* =========================================
+           03. ENCABEZADO ADMINISTRATIVO
+        ========================================= */
+
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .header-inner {
+            min-height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 32px;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .brand small {
+            display: block;
+            margin-top: 5px;
+            font-family: 'Jost', sans-serif;
+            font-size: 9px;
+            letter-spacing: 2px;
+            color: #aa8764;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+
+        /* =========================================
+           04. BOTONES
+        ========================================= */
+
+        .btn {
+            border: 1px solid var(--plum);
+            background: var(--plum);
+            color: white;
+            border-radius: 22px;
+            padding: 10px 17px;
+            font-size: 12px;
+        }
+
+        .btn.light {
+            background: white;
+            color: var(--plum);
+            border-color: var(--border);
+        }
+
+        .btn.gold {
+            background: #aa8764;
+            border-color: #aa8764;
+        }
+
+        .btn.danger {
+            background: white;
+            color: var(--danger);
+            border-color: #e4b9bc;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+
+        /* =========================================
+           05. TÍTULOS
+        ========================================= */
+
+        .page-title {
+            padding: 34px 0 20px;
+        }
+
+        .eyebrow {
+            color: #aa8764;
+            font-size: 10px;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: clamp(38px, 5vw, 52px);
+            margin: 5px 0;
+        }
+
+        h2 {
+            font-size: 34px;
+            margin: 0 0 10px;
+        }
+
+        h3 {
+            font-size: 25px;
+            margin: 0 0 8px;
+        }
+
+
+        /* =========================================
+           06. CUATRO INDICADORES
+        ========================================= */
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .metric {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: var(--shadow);
+            min-width: 0;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .metric-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 40px;
+            line-height: 1;
+            margin-top: 8px;
+        }
+
+
+        /* =========================================
+           07. MENÚ DE MÓDULOS
+        ========================================= */
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 4px 0 18px;
+            scrollbar-width: thin;
+        }
+
+        .tab {
+            flex-shrink: 0;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 25px;
+            padding: 10px 17px;
+            font-size: 12px;
+            color: var(--plum);
+        }
+
+        .tab.active {
+            background: var(--plum);
+            border-color: var(--plum);
+            color: white;
+        }
+
+
+        /* =========================================
+           08. PANELES Y TARJETAS
+        ========================================= */
+
+        .panel {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+            margin-bottom: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .items {
+            display: grid;
+            gap: 12px;
+        }
+
+        .item {
+            border: 1px solid var(--border);
+            background: #fffdfb;
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .item-title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .item-description {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.5;
+            margin: 6px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .item-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-top: 12px;
+        }
+
+        .empty {
+            padding: 25px;
+            text-align: center;
+            color: var(--muted);
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+        }
+
+
+        /* =========================================
+           09. FORMULARIOS
+        ========================================= */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 13px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        .field label {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            width: 100%;
+            min-width: 0;
+            border: 1px solid #dccbc4;
+            border-radius: 9px;
+            background: white;
+            padding: 11px;
+            color: var(--plum);
+        }
+
+        .field textarea {
+            min-height: 85px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-top: 12px;
+        }
+
+
+        /* =========================================
+           10. AGENDA Y ESTADOS
+        ========================================= */
+
+        .appointment {
+            display: grid;
+            grid-template-columns: 90px 1fr auto;
+            gap: 12px;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding: 14px 0;
+        }
+
+        .appointment:last-child {
+            border-bottom: 0;
+        }
+
+        .appointment-time {
+            font-size: 14px;
+            font-weight: 600;
+            color: #a47c59;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            background: #f4e8e4;
+            font-size: 11px;
+            color: var(--plum);
+        }
+
+        .status.confirmada {
+            background: #e5eee4;
+            color: #456a48;
+        }
+
+        .status.cancelada {
+            background: #f4e0e1;
+            color: #9a424b;
+        }
+
+        .notice {
+            border: 1px solid #e9d5b7;
+            background: #fff6e9;
+            padding: 14px;
+            border-radius: 11px;
+            font-size: 12px;
+            line-height: 1.6;
+            color: #775d3e;
+            margin-bottom: 18px;
+        }
+
+
+        /* =========================================
+           11. VENTANAS EMERGENTES
+        ========================================= */
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: rgba(40, 26, 32, 0.58);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .modal-content {
+            width: min(620px, 100%);
+            max-height: 92vh;
+            overflow-y: auto;
+            background: var(--ivory);
+            padding: 23px;
+            border-radius: 16px;
+        }
+
+        .modal-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .close {
+            border: 0;
+            background: none;
+            font-size: 27px;
+            color: var(--plum);
+        }
+
+
+        /* =========================================
+           12. MENSAJES
+        ========================================= */
+
+        .toast {
+            position: fixed;
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--plum);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 24px;
+            font-size: 12px;
+            z-index: 200;
+            box-shadow: var(--shadow);
+            max-width: calc(100% - 24px);
+        }
+
+
+        /* =========================================
+           13. ADAPTACIÓN MÓVIL
+        ========================================= */
+
+        @media (max-width: 700px) {
+
+            .header-inner {
+                min-height: 66px;
+            }
+
+            .brand {
+                font-size: 26px;
+            }
+
+            .metrics {
+                gap: 5px;
+            }
+
+            .metric {
+                padding: 10px 5px;
+                text-align: center;
+                border-radius: 9px;
+            }
+
+            .metric-label {
+                font-size: 9px;
+                line-height: 1.2;
+                min-height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .metric-value {
+                font-size: 30px;
+                margin-top: 5px;
+            }
+
+            .panel {
+                padding: 15px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .appointment {
+                grid-template-columns: 65px 1fr;
+            }
+
+            .appointment .status {
+                grid-column: 2;
+                justify-self: start;
+            }
+
+            .header-actions .btn {
+                padding: 9px 11px;
+                font-size: 11px;
+            }
+
+        }
+
+
+        /* =========================================
+           13A. ACCESO SEGURO SUPABASE
+        ========================================= */
+
+        .login-screen {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 22px;
+            background: var(--ivory);
+        }
+
+        .login-card {
+            width: min(420px, 100%);
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+        }
+
+        .login-card h1 {
+            font-size: 44px;
+            margin-bottom: 8px;
+        }
+
+        .login-error {
+            color: var(--danger);
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+
+        /* =========================================
+           13B. VISTA PREVIA Y RETOQUES DE VIDEO
+        ========================================= */
+        .lystla-video-preview {
+            width: 100%;
+            max-height: 360px;
+            object-fit: contain;
+            display: block;
+            background: transparent;
+            border-radius: 12px;
+        }
+        .lystla-video-preview[data-orientation="vertical"] {
+            width: auto;
+            max-width: 100%;
+            max-height: min(55vh, 430px);
+            margin-inline: auto;
+        }
+        .lystla-video-preview[data-orientation="horizontal"] {
+            width: 100%;
+            max-height: 360px;
+        }
+        .lystla-preview-wrap {
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #f6efea;
+            text-align: center;
+        }
+        .lystla-preview-wrap video {
+            filter: var(--lystla-video-filter, none);
+        }
+        .lystla-preview-status {
+            margin-top: 9px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+    <!-- =========================================
+         ACCESO A ADMINISTRACIÓN
+    ========================================= -->
+
+    <section id="login-screen" class="login-screen">
+
+        <div class="login-card">
+
+            <span class="eyebrow">Makeover Salon by Fary Montes</span>
+
+            <h1>Lystla</h1>
+
+            <p class="muted small" id="login-message">
+                Comprobando acceso seguro...
+            </p>
+
+            <form id="login-form" hidden>
+
+                <div class="field">
+                    <label for="login-email">Correo electrónico</label>
+                    <input id="login-email" type="email" required autocomplete="username">
+                </div>
+
+                <div class="field">
+                    <label for="login-password">Contraseña</label>
+                    <input id="login-password" type="password" required autocomplete="current-password">
+                </div>
+
+                <button class="btn" id="login-submit" type="submit">
+                    Iniciar sesión
+                </button>
+
+                <p id="login-error" class="login-error" role="alert" hidden></p>
+
+            </form>
+
+            <a href="index.html" class="btn light" style="display:inline-block;margin-top:16px;">
+                Volver a la tienda
+            </a>
+
+        </div>
+
+    </section>
+
+    <div id="admin-shell" hidden>
+
+
+    <!-- =========================================
+         14. ENCABEZADO
+    ========================================= -->
+
+    <header class="header">
+
+        <div class="container header-inner">
+
+            <div class="brand">
+
+                Lystla
+
+                <small>
+                    ADMINISTRACIÓN
+                </small>
+
+            </div>
+
+            <div class="header-actions">
+
+                <a
+                    href="index.html"
+                    class="btn light"
+                >
+                    Ver tienda
+                </a>
+
+                <button class="btn light" type="button" id="logout-button">
+                    Cerrar sesión
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <main class="container">
+
+        <!-- =========================================
+             15. BIENVENIDA
+        ========================================= -->
+
+        <section class="page-title">
+
+            <span class="eyebrow">
+                Makeover Salon by Fary Montes
+            </span>
+
+            <h1>
+                Panel de administración
+            </h1>
+
+            <p class="muted small">
+                Control de agenda, servicios, productos y promociones.
+            </p>
+
+        </section>
+
+
+        <!-- =========================================
+             16. AVISO DE MODO DEMOSTRACIÓN
+        ========================================= -->
+
+        <div class="notice">
+
+            <strong>
+                Acceso protegido por Supabase.
+            </strong>
+
+            La sesión de administrador ya se valida con Supabase.
+            Los módulos todavía guardan cambios solamente en este navegador.
+            No ingreses datos reales de clientes hasta conectar las tablas.
+
+        </div>
+
+
+        <!-- =========================================
+             17. INDICADORES DEL DASHBOARD
+        ========================================= -->
+
+        <section class="metrics">
+
+            <article class="metric">
+
+                <div class="metric-label">
+                    Citas de hoy
+                </div>
+
+                <div
+                    class="metric-value"
+                    id="metric-today"
+                >
+                    0
+                </div>
+
+            </article>
+
+
+            <article class="metric">
+
+                <div class="metric-label">
+                    Próximas citas
+                </div>
+
+                <div
+                    class="metric-value"
+                    id="metric-upcoming"
+                >
+                    0
+                </div>
+
+            </article>
+
+
+            <article class="metric">
+
+                <div class="metric-label">
+                    Pedidos nuevos
+                </div>
+
+                <div
+                    class="metric-value"
+                    id="metric-orders"
+                >
+                    —
+                </div>
+
+            </article>
+
+
+            <article class="metric">
+
+                <div class="metric-label">
+                    Alertas
+                </div>
+
+                <div
+                    class="metric-value"
+                    id="metric-alerts"
+                >
+                    0
+                </div>
+
+            </article>
+
+        </section>
+
+
+        <!-- =========================================
+             18. NAVEGACIÓN DE MÓDULOS
+        ========================================= -->
+
+        <nav class="tabs">
+
+            <button
+                class="tab active"
+                data-tab="dashboard"
+                type="button"
+            >
+                Inicio
+            </button>
+
+            <button
+                class="tab"
+                data-tab="agenda"
+                type="button"
+            >
+                Agenda
+            </button>
+
+            <button
+                class="tab"
+                data-tab="servicios"
+                type="button"
+            >
+                Servicios
+            </button>
+
+            <button
+                class="tab"
+                data-tab="productos"
+                type="button"
+            >
+                Productos
+            </button>
+
+            <button
+                class="tab"
+                data-tab="promociones"
+                type="button"
+            >
+                Promociones
+            </button>
+
+            <button
+                class="tab"
+                data-tab="configuracion"
+                type="button"
+            >
+                Configuración
+            </button>
+
+        </nav>
+
+
+        <!-- =========================================
+             19. DASHBOARD PRINCIPAL
+        ========================================= -->
+
+        <section
+            id="view-dashboard"
+            class="view"
+        >
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Mi agenda de hoy
+                    </h2>
+
+                    <button
+                        class="btn"
+                        type="button"
+                        data-new="appointment"
+                    >
+                        + Cita
+                    </button>
+
+                </div>
+
+                <div id="today-list"></div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <h2>
+                    Resumen del negocio
+                </h2>
+
+                <p
+                    class="muted small"
+                    id="business-summary"
+                ></p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             20. MÓDULO DE AGENDA
+        ========================================= -->
+
+        <section
+            id="view-agenda"
+            class="view"
+            hidden
+        >
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Agenda de citas
+                    </h2>
+
+                    <button
+                        class="btn"
+                        type="button"
+                        data-new="appointment"
+                    >
+                        + Nueva cita
+                    </button>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="agenda-date">
+                        Consultar fecha
+                    </label>
+
+                    <input
+                        type="date"
+                        id="agenda-date"
+                    >
+
+                </div>
+
+
+                <div id="agenda-list"></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             21. MÓDULO DE SERVICIOS
+        ========================================= -->
+
+        <section
+            id="view-servicios"
+            class="view"
+            hidden
+        >
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Servicios
+                    </h2>
+
+                    <button
+                        class="btn"
+                        type="button"
+                        data-new="service"
+                    >
+                        + Servicio
+                    </button>
+
+                </div>
+
+                <div
+                    class="items"
+                    id="services-list"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             22. MÓDULO DE PRODUCTOS
+        ========================================= -->
+
+        <section
+            id="view-productos"
+            class="view"
+            hidden
+        >
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Productos
+                    </h2>
+
+                    <button
+                        class="btn"
+                        type="button"
+                        data-new="product"
+                    >
+                        + Producto
+                    </button>
+
+                </div>
+
+                <div
+                    class="items"
+                    id="products-list"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             23. MÓDULO DE PROMOCIONES
+        ========================================= -->
+
+        <section
+            id="view-promociones"
+            class="view"
+            hidden
+        >
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Promociones
+                    </h2>
+
+                    <button
+                        class="btn"
+                        type="button"
+                        data-new="promotion"
+                    >
+                        + Promoción
+                    </button>
+
+                </div>
+
+                <div
+                    class="items"
+                    id="promotions-list"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             24. CONFIGURACIÓN DEL SALÓN
+        ========================================= -->
+
+        <section
+            id="view-configuracion"
+            class="view"
+            hidden
+        >
+
+            <div class="panel">
+
+                <h2>
+                    Configuración del salón
+                </h2>
+
+                <form id="settings-form">
+
+                    <div class="form-grid">
+
+                        <div class="field">
+
+                            <label for="setting-phone">
+                                WhatsApp del salón
+                            </label>
+
+                            <input
+                                id="setting-phone"
+                                type="tel"
+                                placeholder="523221234567"
+                            >
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="setting-open">
+                                Hora de apertura
+                            </label>
+
+                            <input
+                                id="setting-open"
+                                type="time"
+                            >
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="setting-close">
+                                Hora de cierre
+                            </label>
+
+                            <input
+                                id="setting-close"
+                                type="time"
+                            >
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="setting-reminders">
+                                Horarios de recordatorios
+                            </label>
+
+                            <input
+                                id="setting-reminders"
+                                placeholder="12:00, 20:00"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="btn"
+                    >
+                        Guardar configuración
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <div class="panel">
+
+                <h2>
+                    Próximas herramientas
+                </h2>
+
+                <p class="muted small">
+                    Al conectar Supabase agregaremos
+                    la administración real de fotografías,
+                    videos, portada, logotipo, personal,
+                    horarios por día, bloqueos, vacaciones,
+                    recordatorios y calendario completo.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    </div> <!-- FIN DE ADMIN-SHELL -->
+
+
+    <!-- =========================================
+         25. VENTANA DE EDICIÓN
+    ========================================= -->
+
+    <div
+        class="modal"
+        id="editor-modal"
+        hidden
+    >
+
+        <div class="modal-content">
+
+            <div class="modal-heading">
+
+                <h2 id="editor-title">
+                    Editar
+                </h2>
+
+                <button
+                    class="close"
+                    type="button"
+                    id="close-editor"
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <form id="editor-form">
+
+                <div id="editor-fields"></div>
+
+                <div class="form-actions">
+
+                    <button
+                        class="btn"
+                        type="submit"
+                    >
+                        Guardar
+                    </button>
+
+                    <button
+                        class="btn light"
+                        type="button"
+                        id="cancel-editor"
+                    >
+                        Cancelar
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         26. MENSAJES EMERGENTES
+    ========================================= -->
+
+    <div
+        id="toast"
+        class="toast"
+        hidden
+    ></div>
+
+
+    <!-- =========================================
+         27. JAVASCRIPT
+    ========================================= -->
+
+    <script>
+
+        'use strict';
+
+
+       
+/* =========================================
+   28. CONFIGURACIÓN LOCAL
+========================================= */
+
+const STORAGE_KEY = 'lystla-admin-demo-v1';
+
+
+const initialData = {
+
+    services: [],
+
+    products: [],
+
+    promotions: [],
+
+    appointments: [],
+
+    settings: {
+
+        phone: '',
+
+        open: '09:00',
+
+        close: '19:00',
+
+        reminders: '12:00, 20:00'
+
+    }
+
+};
+
+
+        
+/* =========================================
+   29. CARGAR DATOS
+========================================= */
+
+function loadData() {
+
+    const base = structuredClone(initialData);
+
+    try {
+
+        const saved = localStorage.getItem(
+            STORAGE_KEY
+        );
+
+        if (saved) {
+
+            const parsed = JSON.parse(saved);
+
+            if (
+                parsed &&
+                typeof parsed === 'object'
+            ) {
+
+                /*
+                   Los servicios, productos y promociones
+                   se cargarán desde Supabase.
+
+                   No recuperamos los catálogos antiguos
+                   guardados en el navegador.
+                */
+
+                base.services = [];
+
+                base.products = [];
+
+                base.promotions = [];
+
+
+                /*
+                   Conservamos las citas locales.
+                */
+
+                if (
+                    Array.isArray(parsed.appointments)
+                ) {
+
+                    base.appointments =
+                        parsed.appointments;
+
+                }
+
+
+                /*
+                   Conservamos la configuración local.
+                */
+
+                if (
+                    parsed.settings &&
+                    typeof parsed.settings === 'object'
+                ) {
+
+                    base.settings = {
+
+                        ...base.settings,
+
+                        ...parsed.settings
+
+                    };
+
+                }
+
+            }
+
+        }
+
+    } catch (error) {
+
+        console.warn(
+            'No fue posible leer los datos locales.',
+            error
+        );
+
+    }
+
+    return base;
+
+}
+
+
+let data = loadData();
+
+
+
+        /* =========================================
+           30. GUARDAR DATOS
+        ========================================= */
+
+        function saveData() {
+
+            try {
+
+                localStorage.setItem(
+                    STORAGE_KEY,
+                    JSON.stringify(data)
+                );
+
+                renderAll();
+
+                return true;
+
+            } catch (error) {
+
+                alert(
+                    'No fue posible guardar los cambios en este navegador.'
+                );
+
+                return false;
+
+            }
+
+        }
+
+
+        /* =========================================
+           31. HERRAMIENTAS GENERALES
+        ========================================= */
+
+        function $(id) {
+
+            return document.getElementById(id);
+
+        }
+
+
+        function escapeHTML(value) {
+
+            return String(value ?? '').replace(
+                /[&<>"']/g,
+                (character) => {
+
+                    const entities = {
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        '"': '&quot;',
+                        "'": '&#39;'
+                    };
+
+                    return entities[character];
+
+                }
+            );
+
+        }
+
+
+        function money(value) {
+
+            return new Intl.NumberFormat('es-MX', {
+                style: 'currency',
+                currency: 'MXN'
+            }).format(Number(value) || 0);
+
+        }
+
+
+        function todayISO() {
+
+            const now = new Date();
+
+            const year = now.getFullYear();
+
+            const month = String(
+                now.getMonth() + 1
+            ).padStart(2, '0');
+
+            const day = String(
+                now.getDate()
+            ).padStart(2, '0');
+
+            return `${year}-${month}-${day}`;
+
+        }
+
+
+        function currentTime() {
+
+            const now = new Date();
+
+            return [
+                String(now.getHours()).padStart(2, '0'),
+                String(now.getMinutes()).padStart(2, '0')
+            ].join(':');
+
+        }
+
+
+        function generateId() {
+
+            if (
+                window.crypto &&
+                typeof crypto.randomUUID === 'function'
+            ) {
+
+                return crypto.randomUUID();
+
+            }
+
+            return (
+                Date.now().toString(36) +
+                '-' +
+                Math.random().toString(36).slice(2)
+            );
+
+        }
+
+
+        function showToast(message) {
+
+            const toast = $('toast');
+
+            toast.textContent = message;
+
+            toast.hidden = false;
+
+            clearTimeout(showToast.timer);
+
+            showToast.timer = setTimeout(() => {
+
+                toast.hidden = true;
+
+            }, 2600);
+
+        }
+
+
+        /* =========================================
+           32. NAVEGACIÓN DE MÓDULOS
+        ========================================= */
+
+        function showTab(tabName) {
+
+            document.querySelectorAll(
+                '.view'
+            ).forEach((view) => {
+
+                view.hidden =
+                    view.id !== `view-${tabName}`;
+
+            });
+
+
+            document.querySelectorAll(
+                '.tab'
+            ).forEach((button) => {
+
+                button.classList.toggle(
+                    'active',
+                    button.dataset.tab === tabName
+                );
+
+            });
+
+        }
+
+
+        /* =========================================
+           33. VALIDAR CONFLICTOS DE CITAS
+        ========================================= */
+
+        function minutesFromTime(time) {
+
+            const parts = time.split(':').map(Number);
+
+            return (
+                parts[0] * 60 +
+                parts[1]
+            );
+
+        }
+
+
+        function hasConflict(candidate, excludeId = null) {
+
+            const service = data.services.find(
+                (item) => item.id === candidate.serviceId
+            );
+
+            if (!service) {
+                return true;
+            }
+
+
+            const start = minutesFromTime(
+                candidate.time
+            );
+
+            const end = start + Number(
+                service.duration
+            );
+
+
+            const opening = minutesFromTime(
+                data.settings.open
+            );
+
+            const closing = minutesFromTime(
+                data.settings.close
+            );
+
+
+            if (
+                start < opening ||
+                end > closing
+            ) {
+
+                return true;
+
+            }
+
+
+            return data.appointments.some((appointment) => {
+
+                if (
+                    appointment.id === excludeId ||
+                    appointment.date !== candidate.date ||
+                    appointment.status === 'cancelada'
+                ) {
+
+                    return false;
+
+                }
+
+
+                const otherService = data.services.find(
+                    (item) => {
+
+                        return item.id === appointment.serviceId;
+
+                    }
+                );
+
+
+                const otherStart = minutesFromTime(
+                    appointment.time
+                );
+
+                const otherEnd =
+                    otherStart +
+                    Number(otherService?.duration || 60);
+
+
+                return (
+                    start < otherEnd &&
+                    end > otherStart
+                );
+
+            });
+
+        }
+
+
+        /* =========================================
+           34. MOSTRAR INDICADORES
+        ========================================= */
+
+        function renderMetrics() {
+
+            const today = todayISO();
+
+            const nowTime = currentTime();
+
+
+            const activeAppointments = data.appointments.filter(
+                (appointment) => {
+
+                    return appointment.status !== 'cancelada';
+
+                }
+            );
+
+
+            const todayCount = activeAppointments.filter(
+                (appointment) => {
+
+                    return appointment.date === today;
+
+                }
+            ).length;
+
+
+            const upcomingCount = activeAppointments.filter(
+                (appointment) => {
+
+                    return (
+                        appointment.date > today ||
+                        (
+                            appointment.date === today &&
+                            appointment.time >= nowTime
+                        )
+                    );
+
+                }
+            ).length;
+
+
+            const alertsCount = data.products.filter(
+                (product) => {
+
+                    return Number(product.stock) <= 3;
+
+                }
+            ).length;
+
+
+            $('metric-today').textContent = todayCount;
+
+            $('metric-upcoming').textContent = upcomingCount;
+
+            // No hay módulo real de pedidos conectado.
+
+            $('metric-orders').textContent = '—';
+
+            $('metric-alerts').textContent = alertsCount;
+
+        }
+
+
+        /* =========================================
+           35. MOSTRAR AGENDA
+        ========================================= */
+
+        function renderAppointmentList(targetId, date) {
+
+            const appointments = data.appointments
+
+                .filter((appointment) => {
+
+                    return appointment.date === date;
+
+                })
+
+                .sort((a, b) => {
+
+                    return a.time.localeCompare(b.time);
+
+                });
+
+
+            const target = $(targetId);
+
+
+            if (appointments.length === 0) {
+
+                target.innerHTML = `
+
+                    <div class="empty">
+                        No hay citas registradas
+                        para esta fecha.
+                    </div>
+
+                `;
+
+                return;
+
+            }
+
+
+            target.innerHTML = appointments.map(
+                (appointment) => {
+
+                    const service = data.services.find(
+                        (item) => {
+
+                            return item.id === appointment.serviceId;
+
+                        }
+                    );
+
+
+                    return `
+
+                        <div class="appointment">
+
+                            <div class="appointment-time">
+                                ${escapeHTML(appointment.time)}
+                            </div>
+
+
+                            <div>
+
+                                <div class="item-title">
+                                    ${escapeHTML(appointment.client)}
+                                </div>
+
+                                <div class="item-description">
+                                    ${escapeHTML(service?.name || 'Servicio')}
+                                </div>
+
+                                <button
+                                    class="btn light"
+                                    type="button"
+                                    data-edit-type="appointment"
+                                    data-edit-id="${escapeHTML(appointment.id)}"
+                                >
+                                    Editar
+                                </button>
+
+                            </div>
+
+
+                            <span
+                                class="status ${escapeHTML(appointment.status)}"
+                            >
+                                ${escapeHTML(appointment.status)}
+                            </span>
+
+                        </div>
+
+                    `;
+
+                }
+            ).join('');
+
+        }
+
+
+        /* =========================================
+           36. MOSTRAR SERVICIOS
+        ========================================= */
+
+        function renderServices() {
+
+            const target = $('services-list');
+
+
+            if (data.services.length === 0) {
+
+                target.innerHTML = `
+
+                    <div class="empty">
+                        No hay servicios registrados.
+                    </div>
+
+                `;
+
+                return;
+
+            }
+
+
+            target.innerHTML = data.services.map(
+                (service) => {
+
+                    return `
+
+                        <article class="item">
+
+                            <div class="item-title">
+                                ${escapeHTML(service.name)}
+                            </div>
+
+                            <div class="item-description">
+                                ${escapeHTML(service.description)}
+                            </div>
+
+                            <div class="item-description">
+
+                                Precio:
+                                ${
+                                    Number(service.price) > 0
+                                        ? money(service.price)
+                                        : 'Por confirmar'
+                                }
+
+                                ·
+
+                                Duración:
+                                ${Number(service.duration)} min
+
+                            </div>
+
+                            <div class="item-actions">
+
+                                <button
+                                    class="btn light"
+                                    type="button"
+                                    data-edit-type="service"
+                                    data-edit-id="${escapeHTML(service.id)}"
+                                >
+                                    Editar
+                                </button>
+
+                                <button
+                                    class="btn danger"
+                                    type="button"
+                                    data-delete-type="service"
+                                    data-delete-id="${escapeHTML(service.id)}"
+                                >
+                                    Eliminar
+                                </button>
+
+                            </div>
+
+                        </article>
+
+                    `;
+
+                }
+            ).join('');
+
+        }
+
+
+        /* =========================================
+           37. MOSTRAR PRODUCTOS
+        ========================================= */
+
+        function renderProducts() {
+
+            const target = $('products-list');
+
+
+            if (data.products.length === 0) {
+
+                target.innerHTML = `
+
+                    <div class="empty">
+                        Todavía no hay productos registrados.
+                    </div>
+
+                `;
+
+                return;
+
+            }
+
+
+            target.innerHTML = data.products.map(
+                (product) => {
+
+                    return `
+
+                        <article class="item">
+
+                            <div class="item-title">
+                                ${escapeHTML(product.name)}
+                            </div>
+
+                            <div class="item-description">
+                                ${escapeHTML(product.description)}
+                            </div>
+
+                            <div class="item-description">
+
+                                ${money(product.price)}
+
+                                ·
+
+                                Existencias:
+                                ${Number(product.stock)}
+
+                            </div>
+
+                            <div class="item-actions">
+
+                                <button
+                                    class="btn light"
+                                    type="button"
+                                    data-edit-type="product"
+                                    data-edit-id="${escapeHTML(product.id)}"
+                                >
+                                    Editar
+                                </button>
+
+                                <button
+                                    class="btn danger"
+                                    type="button"
+                                    data-delete-type="product"
+                                    data-delete-id="${escapeHTML(product.id)}"
+                                >
+                                    Eliminar
+                                </button>
+
+                            </div>
+
+                        </article>
+
+                    `;
+
+                }
+            ).join('');
+
+        }
+
+
+        /* =========================================
+           38. MOSTRAR PROMOCIONES
+        ========================================= */
+
+        function renderPromotions() {
+
+            const target = $('promotions-list');
+
+
+            if (data.promotions.length === 0) {
+
+                target.innerHTML = `
+
+                    <div class="empty">
+                        No hay promociones registradas.
+                    </div>
+
+                `;
+
+                return;
+
+            }
+
+
+            target.innerHTML = data.promotions.map(
+                (promotion) => {
+
+                    return `
+
+                        <article class="item">
+
+                            <div class="item-title">
+                                ${escapeHTML(promotion.title)}
+                            </div>
+
+                            <div class="item-description">
+                                ${escapeHTML(promotion.description)}
+                            </div>
+
+                            <div class="item-description">
+
+                                ${escapeHTML(promotion.start)}
+
+                                al
+
+                                ${escapeHTML(promotion.end)}
+
+                                ·
+
+                                ${
+                                    promotion.active
+                                        ? 'Activa'
+                                        : 'Inactiva'
+                                }
+
+                            </div>
+
+                            <div class="item-actions">
+
+                                <button
+                                    class="btn light"
+                                    type="button"
+                                    data-edit-type="promotion"
+                                    data-edit-id="${escapeHTML(promotion.id)}"
+                                >
+                                    Editar
+                                </button>
+
+                                <button
+                                    class="btn danger"
+                                    type="button"
+                                    data-delete-type="promotion"
+                                    data-delete-id="${escapeHTML(promotion.id)}"
+                                >
+                                    Eliminar
+                                </button>
+
+                            </div>
+
+                        </article>
+
+                    `;
+
+                }
+            ).join('');
+
+        }
+
+
+        /* =========================================
+           39. MOSTRAR RESUMEN
+        ========================================= */
+
+        function renderSummary() {
+
+            $('business-summary').textContent = [
+
+                data.services.length + ' servicios registrados.',
+
+                data.products.length + ' productos registrados.',
+
+                data.promotions.length + ' promociones registradas.',
+
+                'Datos de prueba guardados en este navegador.'
+
+            ].join(' ');
+
+        }
+
+
+        /* =========================================
+           40. MOSTRAR CONFIGURACIÓN
+        ========================================= */
+
+        function renderSettings() {
+
+            $('setting-phone').value =
+                data.settings.phone || '';
+
+            $('setting-open').value =
+                data.settings.open || '09:00';
+
+            $('setting-close').value =
+                data.settings.close || '19:00';
+
+            $('setting-reminders').value =
+                data.settings.reminders || '';
+
+        }
+
+
+        /* =========================================
+           41. ACTUALIZAR TODO EL PANEL
+        ========================================= */
+
+        function renderAll() {
+
+            renderMetrics();
+
+            renderAppointmentList(
+                'today-list',
+                todayISO()
+            );
+
+            renderAppointmentList(
+                'agenda-list',
+                $('agenda-date').value || todayISO()
+            );
+
+            renderServices();
+
+            renderProducts();
+
+            renderPromotions();
+
+            renderSummary();
+
+            renderSettings();
+
+        }
+
+
+        /* =========================================
+           42. FORMULARIOS DINÁMICOS
+        ========================================= */
+
+        let editorType = null;
+
+        let editorId = null;
+
+
+        function fieldHTML(
+            name,
+            label,
+            value = '',
+            type = 'text',
+            required = false
+        ) {
+
+            const escapedValue = escapeHTML(value);
+
+            return `
+
+                <div class="field">
+
+                    <label for="field-${name}">
+                        ${escapeHTML(label)}
+                    </label>
+
+                    <input
+                        id="field-${name}"
+                        name="${name}"
+                        type="${type}"
+                        value="${escapedValue}"
+                        ${required ? 'required' : ''}
+                    >
+
+                </div>
+
+            `;
+
+        }
+
+
+        function textareaHTML(
+            name,
+            label,
+            value = ''
+        ) {
+
+            return `
+
+                <div class="field">
+
+                    <label for="field-${name}">
+                        ${escapeHTML(label)}
+                    </label>
+
+                    <textarea
+                        id="field-${name}"
+                        name="${name}"
+                    >${escapeHTML(value)}</textarea>
+
+                </div>
+
+            `;
+
+        }
+
+
+      
+        /* =========================================
+           AUDIO EXCLUSIVO EN PREVISUALIZACIÓN
+        ========================================= */
+        document.addEventListener('play', event => {
+            if (!(event.target instanceof HTMLMediaElement)) return;
+            document.querySelectorAll('video, audio').forEach(media => {
+                if (media !== event.target && !media.paused) media.pause();
+            });
+        }, true);
+
+        /* =========================================
+           42A. RETOQUES Y PREVISUALIZACIÓN
+        ========================================= */
+
+        const LYSTLA_VIDEO_PRESETS = [
+            { id: 'natural', name: 'Natural', css: 'none' },
+            { id: 'beauty', name: 'Piel Suave', css: 'brightness(1.055) contrast(.89) saturate(1.09) blur(.55px)' },
+            { id: 'glow', name: 'Color Vivo', css: 'brightness(1.07) contrast(1.07) saturate(1.40)' },
+            { id: 'warm', name: 'Champagne Cálido', css: 'sepia(.13) saturate(1.38) brightness(1.045) contrast(1.03)' },
+            { id: 'clear', name: 'Color Intenso', css: 'contrast(1.10) saturate(1.65) brightness(1.03)' }
+        ];
+
+        function normalizarFiltroVideo(value) {
+            return LYSTLA_VIDEO_PRESETS.some((preset) => preset.id === value)
+                ? value
+                : 'natural';
+        }
+
+        function cssFiltroVideo(value) {
+            return LYSTLA_VIDEO_PRESETS.find(
+                (preset) => preset.id === normalizarFiltroVideo(value)
+            ).css;
+        }
+
+        let lystlaVideoObjectURL = null;
+
+        function limpiarVistaPreviaLystla() {
+            if (lystlaVideoObjectURL) {
+                URL.revokeObjectURL(lystlaVideoObjectURL);
+                lystlaVideoObjectURL = null;
+            }
+        }
+
+        function iniciarVistaPreviaLystla(type, item) {
+            limpiarVistaPreviaLystla();
+
+            const prefijo = type === 'service' ? 'service' : 'product';
+            const input = document.getElementById(`field-${prefijo}-video`);
+            const preview = document.getElementById('lystla-video-preview');
+            const empty = document.getElementById('lystla-preview-empty');
+            const status = document.getElementById('lystla-preview-status');
+            const selector = document.getElementById('field-video-filter');
+
+            if (!input || !preview || !selector) return;
+
+            const actualizarFiltro = () => {
+                preview.style.setProperty(
+                    '--lystla-video-filter',
+                    cssFiltroVideo(selector.value)
+                );
+            };
+
+            const mostrar = (url) => {
+                preview.pause();
+                preview.removeAttribute('src');
+                preview.load();
+                if (!url) {
+                    preview.hidden = true;
+                    empty.hidden = false;
+                    status.textContent = '';
+                    return;
+                }
+                preview.src = url;
+                preview.hidden = false;
+                empty.hidden = true;
+                status.textContent = 'Leyendo formato del video...';
+                actualizarFiltro();
+            };
+
+            preview.addEventListener('loadedmetadata', () => {
+                const vertical = preview.videoHeight > preview.videoWidth;
+                preview.dataset.orientation = vertical ? 'vertical' : 'horizontal';
+                status.textContent = vertical
+                    ? 'Formato vertical · video completo, sin recortes.'
+                    : 'Formato horizontal · video completo, sin recortes.';
+            });
+
+            preview.addEventListener('error', () => {
+                status.textContent = 'No se pudo reproducir este video. Verifica que sea MP4 o WEBM compatible.';
+            });
+
+            selector.addEventListener('change', actualizarFiltro);
+
+            input.addEventListener('change', () => {
+                limpiarVistaPreviaLystla();
+                const archivo = input.files?.[0];
+                if (archivo) {
+                    lystlaVideoObjectURL = URL.createObjectURL(archivo);
+                    mostrar(lystlaVideoObjectURL);
+                } else {
+                    mostrar(item.video_url || '');
+                }
+            });
+
+            mostrar(item.video_url || '');
+        }
+
+
+        /* =========================================
+           43. ABRIR EDITOR
+        ========================================= */
+
+        function openEditor(type, id = null) {
+
+            editorType = type;
+
+            editorId = id;
+
+
+            const collectionNames = {
+                service: 'services',
+                product: 'products',
+                promotion: 'promotions',
+                appointment: 'appointments'
+            };
+
+
+            const collection = data[
+                collectionNames[type]
+            ];
+
+
+            if (!collection) {
+                return;
+            }
+
+
+            const item = collection.find(
+                (entry) => entry.id === id
+            ) || {};
+
+
+            let fields = '';
+
+            let title = '';
+
+
+            /* =====================================
+               01. EDITAR SERVICIO
+            ===================================== */
+
+            if (type === 'service') {
+
+                title = id
+                    ? 'Editar servicio'
+                    : 'Nuevo servicio';
+
+
+                fields += fieldHTML(
+                    'name',
+                    'Nombre del servicio',
+                    item.name,
+                    'text',
+                    true
+                );
+
+
+                fields += textareaHTML(
+                    'description',
+                    'Descripción',
+                    item.description
+                );
+
+
+                fields += fieldHTML(
+                    'price',
+                    'Precio en pesos',
+                    item.price ?? 0,
+                    'number',
+                    true
+                );
+
+
+                fields += fieldHTML(
+                    'duration',
+                    'Duración en minutos',
+                    item.duration ?? 60,
+                    'number',
+                    true
+                );
+
+
+                /* =====================================
+                   FOTOGRAFÍA DEL SERVICIO
+                ===================================== */
+
+                fields += `
+
+                    <div class="field">
+
+                        <label for="field-service-image">
+                            Fotografía del servicio
+                        </label>
+
+                        <input
+                            id="field-service-image"
+                            name="service_image"
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                        >
+
+                        <p class="small muted">
+                            JPG, PNG o WEBP.
+                            Máximo 5 MB.
+                        </p>
+
+                    </div>
+
+                `;
+
+
+                /* =====================================
+                   VIDEO DEL SERVICIO
+                ===================================== */
+
+                fields += `
+
+                    <div class="field">
+
+                        <label for="field-service-video">
+                            Video demostrativo
+                        </label>
+
+                        <input
+                            id="field-service-video"
+                            name="service_video"
+                            type="file"
+                            accept="video/mp4,video/webm"
+                        >
+
+                        <p class="small muted">
+                            MP4 o WEBM.
+                            Máximo 30 MB.
+                        </p>
+
+                    </div>
+
+                `;
+
+
+                /* =====================================
+                   RETOQUE Y VISTA PREVIA DE VIDEO
+                ===================================== */
+
+                fields += `
+                    <div class="field full">
+                        <label for="field-video-filter">Retoque del video</label>
+                        <select id="field-video-filter" name="video_filter">
+                            ${LYSTLA_VIDEO_PRESETS.map((preset) => `
+                                <option value="${preset.id}"
+                                    ${normalizarFiltroVideo(item.video_filter) === preset.id ? 'selected' : ''}>
+                                    ${preset.name}
+                                </option>
+                            `).join('')}
+                        </select>
+                        <p class="small muted">El retoque cambia la reproducción; no altera el archivo original.</p>
+                    </div>
+                    <div class="field full" id="lystla-preview-section">
+                        <label>Vista previa del video</label>
+                        <div class="lystla-preview-wrap">
+                            <video id="lystla-video-preview" class="lystla-video-preview"
+                                controls playsinline preload="metadata" hidden></video>
+                            <div id="lystla-preview-empty" class="small muted">
+                                Selecciona un video MP4 o WEBM para previsualizarlo.
+                            </div>
+                            <div id="lystla-preview-status" class="lystla-preview-status"></div>
+                        </div>
+                    </div>
+                `;
+
+
+                /* =====================================
+                   MOSTRAR FOTOGRAFÍA ACTUAL
+                ===================================== */
+
+                if (item.image_url) {
+
+                    fields += `
+
+                        <div class="field">
+
+                            <label>
+                                Fotografía actual
+                            </label>
+
+                            <img
+                                src="${escapeHTML(item.image_url)}"
+                                alt="Fotografía del servicio"
+                                style="
+                                    width: 100%;
+                                    max-width: 260px;
+                                    height: auto;
+                                    border-radius: 12px;
+                                "
+                            >
+
+                        </div>
+
+                    `;
+
+                }
+
+
+                /* =====================================
+                   MOSTRAR VIDEO ACTUAL
+                ===================================== */
+
+                if (item.video_url) {
+
+                    fields += `
+
+                        <div class="field">
+
+                            <label>
+                                Video actual
+                            </label>
+
+                            <video
+                                src="${escapeHTML(item.video_url)}"
+                                controls
+                                preload="metadata"
+                                style="
+                                    width: 100%;
+                                    max-width: 320px;
+                                    border-radius: 12px;
+                                "
+                            ></video>
+
+                        </div>
+
+                    `;
+
+                }
+
+            }
+
+
+            /* =====================================
+               02. EDITAR PRODUCTO
+            ===================================== */
+
+            if (type === 'product') {
+
+                title = id
+                    ? 'Editar producto'
+                    : 'Nuevo producto';
+
+
+                fields += fieldHTML(
+                    'name',
+                    'Nombre del producto',
+                    item.name,
+                    'text',
+                    true
+                );
+
+
+                fields += textareaHTML(
+                    'description',
+                    'Descripción',
+                    item.description
+                );
+
+
+                fields += fieldHTML(
+                    'price',
+                    'Precio en pesos',
+                    item.price ?? 0,
+                    'number',
+                    true
+                );
+
+
+                fields += fieldHTML(
+                    'stock',
+                    'Existencias',
+                    item.stock ?? 0,
+                    'number',
+                    true
+                );
+
+
+                /* =====================================
+                   FOTOGRAFÍA DEL PRODUCTO
+                ===================================== */
+
+                fields += `
+
+                    <div class="field">
+
+                        <label for="field-product-image">
+                            Fotografía del producto
+                        </label>
+
+                        <input
+                            id="field-product-image"
+                            name="product_image"
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                        >
+
+                        <p class="small muted">
+                            JPG, PNG o WEBP.
+                            Máximo 5 MB.
+                        </p>
+
+                    </div>
+
+                `;
+
+
+                /* =====================================
+                   VIDEO DEL PRODUCTO
+                ===================================== */
+
+                fields += `
+
+                    <div class="field">
+
+                        <label for="field-product-video">
+                            Video del producto
+                        </label>
+
+                        <input
+                            id="field-product-video"
+                            name="product_video"
+                            type="file"
+                            accept="video/mp4,video/webm"
+                        >
+
+                        <p class="small muted">
+                            MP4 o WEBM.
+                            Máximo 30 MB.
+                        </p>
+
+                    </div>
+
+                `;
+
+
+                /* =====================================
+                   RETOQUE Y VISTA PREVIA DE VIDEO
+                ===================================== */
+
+                fields += `
+                    <div class="field full">
+                        <label for="field-video-filter">Retoque del video</label>
+                        <select id="field-video-filter" name="video_filter">
+                            ${LYSTLA_VIDEO_PRESETS.map((preset) => `
+                                <option value="${preset.id}"
+                                    ${normalizarFiltroVideo(item.video_filter) === preset.id ? 'selected' : ''}>
+                                    ${preset.name}
+                                </option>
+                            `).join('')}
+                        </select>
+                        <p class="small muted">El retoque cambia la reproducción; no altera el archivo original.</p>
+                    </div>
+                    <div class="field full" id="lystla-preview-section">
+                        <label>Vista previa del video</label>
+                        <div class="lystla-preview-wrap">
+                            <video id="lystla-video-preview" class="lystla-video-preview"
+                                controls playsinline preload="metadata" hidden></video>
+                            <div id="lystla-preview-empty" class="small muted">
+                                Selecciona un video MP4 o WEBM para previsualizarlo.
+                            </div>
+                            <div id="lystla-preview-status" class="lystla-preview-status"></div>
+                        </div>
+                    </div>
+                `;
+
+
+                /* =====================================
+                   MOSTRAR FOTOGRAFÍA ACTUAL
+                ===================================== */
+
+                if (item.image_url) {
+
+                    fields += `
+
+                        <div class="field">
+
+                            <label>
+                                Fotografía actual
+                            </label>
+
+                            <img
+                                src="${escapeHTML(item.image_url)}"
+                                alt="Fotografía del producto"
+                                style="
+                                    width: 100%;
+                                    max-width: 260px;
+                                    height: auto;
+                                    border-radius: 12px;
+                                "
+                            >
+
+                        </div>
+
+                    `;
+
+                }
+
+
+                /* =====================================
+                   MOSTRAR VIDEO ACTUAL
+                ===================================== */
+
+                if (item.video_url) {
+
+                    fields += `
+
+                        <div class="field">
+
+                            <label>
+                                Video actual
+                            </label>
+
+                            <video
+                                src="${escapeHTML(item.video_url)}"
+                                controls
+                                preload="metadata"
+                                style="
+                                    width: 100%;
+                                    max-width: 320px;
+                                    border-radius: 12px;
+                                "
+                            ></video>
+
+                        </div>
+
+                    `;
+
+                }
+
+            }
+
+
+            /* =====================================
+               03. EDITAR PROMOCIÓN
+               PRECIO Y FOTOGRAFÍA
+            ===================================== */
+
+            if (type === 'promotion') {
+
+                title = id
+                    ? 'Editar promoción'
+                    : 'Nueva promoción';
+
+
+                fields += fieldHTML(
+                    'title',
+                    'Título de la promoción',
+                    item.title || '',
+                    'text',
+                    true
+                );
+
+
+                fields += textareaHTML(
+                    'description',
+                    'Descripción',
+                    item.description || ''
+                );
+
+
+                fields += fieldHTML(
+                    'promotional_price',
+                    'Precio promocional en pesos',
+                    item.promotional_price ?? '',
+                    'number',
+                    false
+                );
+
+
+                fields += `
+
+                    <div class="field">
+
+                        <label for="field-promotion-image">
+                            Fotografía de la promoción
+                        </label>
+
+                        <input
+                            id="field-promotion-image"
+                            name="promotion_image"
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                        >
+
+                        <p class="small muted">
+                            Formatos JPG, PNG o WEBP.
+                            Máximo 5 MB.
+                        </p>
+
+                    </div>
+
+                `;
+
+
+                if (item.image_url) {
+
+                    fields += `
+
+                        <div class="field">
+
+                            <label>
+                                Fotografía actual
+                            </label>
+
+                            <img
+                                src="${escapeHTML(item.image_url)}"
+                                alt="Fotografía de la promoción"
+                                style="
+                                    width: 100%;
+                                    max-width: 260px;
+                                    height: auto;
+                                    border-radius: 12px;
+                                "
+                            >
+
+                        </div>
+
+                    `;
+
+                }
+
+
+                fields += fieldHTML(
+                    'start',
+                    'Fecha de inicio',
+                    item.start || todayISO(),
+                    'date',
+                    true
+                );
+
+
+                fields += fieldHTML(
+                    'end',
+                    'Fecha de finalización',
+                    item.end || todayISO(),
+                    'date',
+                    true
+                );
+
+
+                fields += `
+
+                    <div class="field">
+
+                        <label for="field-active">
+                            Estado
+                        </label>
+
+                        <select
+                            id="field-active"
+                            name="active"
+                        >
+
+                            <option
+                                value="true"
+                                ${item.active !== false ? 'selected' : ''}
+                            >
+                                Activa
+                            </option>
+
+                            <option
+                                value="false"
+                                ${item.active === false ? 'selected' : ''}
+                            >
+                                Inactiva
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                `;
+
+            }
+
+
+            /* =====================================
+               04. EDITAR CITA
+            ===================================== */
+
+            if (type === 'appointment') {
+
+                title = id
+                    ? 'Editar cita'
+                    : 'Registrar cita';
+
+
+                fields += fieldHTML(
+                    'client',
+                    'Nombre y primer apellido',
+                    item.client,
+                    'text',
+                    true
+                );
+
+
+                fields += fieldHTML(
+                    'phone',
+                    'Teléfono',
+                    item.phone,
+                    'tel',
+                    true
+                );
+
+
+                fields += `
+
+                    <div class="field">
+
+                        <label for="field-serviceId">
+                            Servicio
+                        </label>
+
+                        <select
+                            id="field-serviceId"
+                            name="serviceId"
+                            required
+                        >
+
+                            <option value="">
+                                Seleccionar
+                            </option>
+
+                            ${data.services.map((service) => `
+
+                                <option
+                                    value="${escapeHTML(service.id)}"
+                                    ${
+                                        service.id === item.serviceId
+                                            ? 'selected'
+                                            : ''
+                                    }
+                                >
+                                    ${escapeHTML(service.name)}
+                                </option>
+
+                            `).join('')}
+
+                        </select>
+
+                    </div>
+
+                `;
+
+
+                fields += fieldHTML(
+                    'date',
+                    'Fecha',
+                    item.date || $('agenda-date').value || todayISO(),
+                    'date',
+                    true
+                );
+
+
+                fields += fieldHTML(
+                    'time',
+                    'Hora',
+                    item.time || '10:00',
+                    'time',
+                    true
+                );
+
+
+                fields += `
+
+                    <div class="field">
+
+                        <label for="field-status">
+                            Estado
+                        </label>
+
+                        <select
+                            id="field-status"
+                            name="status"
+                        >
+
+                            <option
+                                value="pendiente"
+                                ${item.status === 'pendiente' ? 'selected' : ''}
+                            >
+                                Pendiente
+                            </option>
+
+                            <option
+                                value="confirmada"
+                                ${item.status === 'confirmada' ? 'selected' : ''}
+                            >
+                                Confirmada
+                            </option>
+
+                            <option
+                                value="cancelada"
+                                ${item.status === 'cancelada' ? 'selected' : ''}
+                            >
+                                Cancelada
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                `;
+
+
+                fields += textareaHTML(
+                    'notes',
+                    'Observaciones',
+                    item.notes
+                );
+
+            }
+
+
+            /* =====================================
+               05. MOSTRAR FORMULARIO
+            ===================================== */
+
+            $('editor-title').textContent = title;
+
+            $('editor-fields').innerHTML = fields;
+
+            if (type === 'service' || type === 'product') {
+                iniciarVistaPreviaLystla(type, item);
+            }
+
+
+            $('editor-modal').hidden = false;
+
+        }
+ 
+
+        /* =========================================
+           44. CERRAR EDITOR
+        ========================================= */
+
+        function closeEditor() {
+            limpiarVistaPreviaLystla();
+
+
+            $('editor-modal').hidden = true;
+
+            editorType = null;
+
+            editorId = null;
+
+        }
+
+
+       
+        /* =========================================
+           45. GUARDAR FORMULARIO
+           LYSTLA - SUPABASE
+        ========================================= */
+
+        async function saveEditor(event) {
+
+            event.preventDefault();
+
+
+            /* =====================================
+               01. GUARDAR PROMOCIONES
+            ===================================== */
+
+            if (editorType === 'promotion') {
+
+                await guardarPromocionSupabase();
+
+                return;
+
+            }
+
+
+            /* =====================================
+               02. GUARDAR SERVICIOS Y PRODUCTOS
+            ===================================== */
+
+            if (
+                editorType === 'service' ||
+                editorType === 'product'
+            ) {
+
+                await guardarCatalogoSupabase();
+
+                return;
+
+            }
+
+
+            /* =====================================
+               03. CONSERVAR GUARDADO DE CITAS
+            ===================================== */
+
+            const form = new FormData(
+                $('editor-form')
+            );
+
+
+            const values = Object.fromEntries(
+                form.entries()
+            );
+
+
+            const collectionNames = {
+                service: 'services',
+                product: 'products',
+                promotion: 'promotions',
+                appointment: 'appointments'
+            };
+
+
+            const collection = data[
+                collectionNames[editorType]
+            ];
+
+
+            if (!collection) {
+                return;
+            }
+
+
+            const existing = collection.find(
+                (item) => item.id === editorId
+            );
+
+
+            const record = {
+                ...existing,
+                ...values,
+                id: editorId || generateId()
+            };
+
+
+            /* =====================================
+               04. VALIDAR CITA
+            ===================================== */
+
+            if (editorType === 'appointment') {
+
+                record.client = record.client
+                    .trim()
+                    .replace(/\s+/g, ' ');
+
+
+                if (
+                    record.client.split(' ').length < 2
+                ) {
+
+                    showToast(
+                        'Escribe nombre y primer apellido.'
+                    );
+
+                    return;
+
+                }
+
+
+                const phoneDigits = record.phone.replace(
+                    /\D/g,
+                    ''
+                );
+
+
+                if (
+                    phoneDigits.length < 10 ||
+                    phoneDigits.length > 15
+                ) {
+
+                    showToast(
+                        'Revisa el teléfono.'
+                    );
+
+                    return;
+
+                }
+
+
+                record.phone = phoneDigits;
+
+
+                if (
+                    record.status !== 'cancelada' &&
+                    hasConflict(record, editorId)
+                ) {
+
+                    showToast(
+                        'El horario está ocupado o fuera del horario del salón.'
+                    );
+
+                    return;
+
+                }
+
+            }
+
+
+            /* =====================================
+               05. GUARDAR CITA EN NAVEGADOR
+            ===================================== */
+
+            if (existing) {
+
+                const index = collection.findIndex(
+                    (item) => item.id === editorId
+                );
+
+                collection[index] = record;
+
+            } else {
+
+                collection.push(record);
+
+            }
+
+
+            if (saveData()) {
+
+                closeEditor();
+
+                showToast(
+                    'Cambios guardados en este navegador.'
+                );
+
+            }
+
+        }
+
+
+        /* =========================================
+           45.1. GUARDAR CATÁLOGO EN SUPABASE
+        ========================================= */
+
+        async function guardarCatalogoSupabase() {
+
+            const formulario = $('editor-form');
+
+            const botonGuardar = formulario.querySelector(
+                'button[type="submit"]'
+            );
+
+            const textoOriginal = botonGuardar
+                ? botonGuardar.textContent
+                : '';
+
+            const tipo = editorType;
+
+            const esServicio = tipo === 'service';
+
+            const tabla = esServicio
+                ? 'lystla_services'
+                : 'lystla_products';
+
+            const bucket = esServicio
+                ? 'lystla-services'
+                : 'lystla-products';
+
+            const coleccion = esServicio
+                ? 'services'
+                : 'products';
+
+            const prefijo = esServicio
+                ? 'service'
+                : 'product';
+
+            const archivosNuevos = [];
+
+            let guardadoCorrecto = false;
+
+
+            if (botonGuardar) {
+
+                botonGuardar.disabled = true;
+
+                botonGuardar.textContent = 'Guardando...';
+
+            }
+
+
+            try {
+
+                /* =====================================
+                   01. OBTENER INFORMACIÓN
+                ===================================== */
+
+                const nombre = formulario.elements[
+                    'name'
+                ].value.trim();
+
+                const descripcion = formulario.elements[
+                    'description'
+                ].value.trim();
+
+                const precio = Number(
+                    formulario.elements['price'].value
+                );
+
+                const imagen = formulario.elements[
+                    `${prefijo}_image`
+                ].files[0];
+
+                const video = formulario.elements[
+                    `${prefijo}_video`
+                ].files[0];
+
+
+                /* =====================================
+                   02. VALIDAR CAMPOS
+                ===================================== */
+
+                if (
+                    !nombre ||
+                    !Number.isFinite(precio) ||
+                    precio < 0
+                ) {
+
+                    showToast(
+                        'Revisa el nombre y el precio.'
+                    );
+
+                    return;
+
+                }
+
+
+                const registro = {
+
+                    name: nombre,
+
+                    description: descripcion,
+
+                    price: precio
+
+                };
+
+
+                if (esServicio) {
+
+                    const duracion = Number(
+                        formulario.elements[
+                            'duration'
+                        ].value
+                    );
+
+
+                    if (
+                        !Number.isInteger(duracion) ||
+                        duracion <= 0
+                    ) {
+
+                        showToast(
+                            'Revisa la duración del servicio.'
+                        );
+
+                        return;
+
+                    }
+
+
+                    registro.duration = duracion;
+
+                } else {
+
+                    const existencias = Number(
+                        formulario.elements[
+                            'stock'
+                        ].value
+                    );
+
+
+                    if (
+                        !Number.isInteger(existencias) ||
+                        existencias < 0
+                    ) {
+
+                        showToast(
+                            'Revisa las existencias del producto.'
+                        );
+
+                        return;
+
+                    }
+
+
+                    registro.stock = existencias;
+
+                }
+
+
+                /* =====================================
+                   03. VALIDAR ARCHIVOS
+                ===================================== */
+
+                const tiposImagen = [
+                    'image/jpeg',
+                    'image/png',
+                    'image/webp'
+                ];
+
+                const tiposVideo = [
+                    'video/mp4',
+                    'video/webm'
+                ];
+
+
+                if (imagen) {
+
+                    if (
+                        !tiposImagen.includes(imagen.type) ||
+                        imagen.size > 5 * 1024 * 1024
+                    ) {
+
+                        showToast(
+                            'La fotografía debe ser JPG, PNG o WEBP, máximo 5 MB.'
+                        );
+
+                        return;
+
+                    }
+
+                }
+
+
+                if (video) {
+
+                    if (
+                        !tiposVideo.includes(video.type) ||
+                        video.size > 30 * 1024 * 1024
+                    ) {
+
+                        showToast(
+                            'El video debe ser MP4 o WEBM, máximo 30 MB.'
+                        );
+
+                        return;
+
+                    }
+
+                }
+
+
+                /* =====================================
+                   04. OBTENER REGISTRO ANTERIOR
+                ===================================== */
+
+                let registroAnterior = null;
+
+
+                if (editorId) {
+
+                    const { data: anterior, error } =
+                        await supabaseClient
+                            .from(tabla)
+                            .select('*')
+                            .eq('id', editorId)
+                            .single();
+
+
+                    if (error) {
+
+                        throw error;
+
+                    }
+
+
+                    registroAnterior = anterior;
+
+                }
+
+
+                /* =====================================
+                   05. SUBIR ARCHIVOS
+                ===================================== */
+
+                async function subirArchivo(
+                    archivo,
+                    categoria
+                ) {
+
+                    if (!archivo) {
+
+                        return null;
+
+                    }
+
+
+                    const extensiones = {
+                        'image/jpeg': 'jpg',
+                        'image/png': 'png',
+                        'image/webp': 'webp',
+                        'video/mp4': 'mp4',
+                        'video/webm': 'webm'
+                    };
+
+
+                    const extension = extensiones[
+                        archivo.type
+                    ];
+
+                    const ruta = `${categoria}/${crypto.randomUUID()}.${extension}`;
+
+
+                    const { error } =
+                        await supabaseClient.storage
+                            .from(bucket)
+                            .upload(
+                                ruta,
+                                archivo,
+                                {
+                                    contentType: archivo.type,
+                                    upsert: false
+                                }
+                            );
+
+
+                    if (error) {
+
+                        throw error;
+
+                    }
+
+
+                    archivosNuevos.push(ruta);
+
+
+                    const { data: archivoPublico } =
+                        supabaseClient.storage
+                            .from(bucket)
+                            .getPublicUrl(ruta);
+
+
+                    return archivoPublico.publicUrl;
+
+                }
+
+
+                const nuevaImagen = await subirArchivo(
+                    imagen,
+                    'images'
+                );
+
+                const nuevoVideo = await subirArchivo(
+                    video,
+                    'videos'
+                );
+
+
+                /* =====================================
+                   06. PREPARAR MULTIMEDIA
+                ===================================== */
+
+                registro.image_url = nuevaImagen ||
+                    registroAnterior?.image_url ||
+                    null;
+
+                registro.video_url = nuevoVideo ||
+                    registroAnterior?.video_url ||
+                    null;
+
+                registro.video_filter = normalizarFiltroVideo(
+                    formulario.elements['video_filter']?.value
+                );
+
+
+                /* =====================================
+                   07. GUARDAR EN BASE DE DATOS
+                ===================================== */
+
+                let resultado;
+
+
+                if (editorId) {
+
+                    resultado = await supabaseClient
+                        .from(tabla)
+                        .update(registro)
+                        .eq('id', editorId)
+                        .select('*')
+                        .single();
+
+                } else {
+
+                    resultado = await supabaseClient
+                        .from(tabla)
+                        .insert(registro)
+                        .select('*')
+                        .single();
+
+                }
+
+
+                if (resultado.error) {
+
+                    throw resultado.error;
+
+                }
+
+
+                guardadoCorrecto = true;
+
+
+                /* =====================================
+                   08. ACTUALIZAR DATOS DEL PANEL
+                ===================================== */
+
+                const registroGuardado = resultado.data;
+
+                const nuevoElemento = {
+
+                    id: registroGuardado.id,
+
+                    name: registroGuardado.name,
+
+                    description:
+                        registroGuardado.description || '',
+
+                    price: Number(
+                        registroGuardado.price
+                    ),
+
+                    image_url:
+                        registroGuardado.image_url || '',
+
+                    video_url:
+                        registroGuardado.video_url || '',
+                    video_filter:
+                        normalizarFiltroVideo(registroGuardado.video_filter),
+
+                    active:
+                        registroGuardado.active !== false
+
+                };
+
+
+                if (esServicio) {
+
+                    nuevoElemento.duration =
+                        registroGuardado.duration;
+
+                } else {
+
+                    nuevoElemento.stock =
+                        registroGuardado.stock;
+
+                }
+
+
+                const lista = data[coleccion];
+
+                const posicion = lista.findIndex(
+                    (item) => item.id === nuevoElemento.id
+                );
+
+
+                if (posicion >= 0) {
+
+                    lista[posicion] = nuevoElemento;
+
+                } else {
+
+                    lista.push(nuevoElemento);
+
+                }
+
+
+                saveData();
+
+                closeEditor();
+
+
+                showToast(
+                    esServicio
+                        ? 'Servicio guardado en Supabase.'
+                        : 'Producto guardado en Supabase.'
+                );
+
+
+                /* =====================================
+                   09. ELIMINAR ARCHIVOS REEMPLAZADOS
+                ===================================== */
+
+                const archivosAnteriores = [];
+
+
+                function obtenerRutaAnterior(url) {
+
+                    if (!url) {
+
+                        return null;
+
+                    }
+
+
+                    const marcador =
+                        `/storage/v1/object/public/${bucket}/`;
+
+
+                    if (!url.includes(marcador)) {
+
+                        return null;
+
+                    }
+
+
+                    return decodeURIComponent(
+                        url.split(marcador)[1]
+                            .split('?')[0]
+                    );
+
+                }
+
+
+                if (
+                    nuevaImagen &&
+                    registroAnterior?.image_url
+                ) {
+
+                    const rutaAnterior = obtenerRutaAnterior(
+                        registroAnterior.image_url
+                    );
+
+
+                    if (rutaAnterior) {
+
+                        archivosAnteriores.push(
+                            rutaAnterior
+                        );
+
+                    }
+
+                }
+
+
+                if (
+                    nuevoVideo &&
+                    registroAnterior?.video_url
+                ) {
+
+                    const rutaAnterior = obtenerRutaAnterior(
+                        registroAnterior.video_url
+                    );
+
+
+                    if (rutaAnterior) {
+
+                        archivosAnteriores.push(
+                            rutaAnterior
+                        );
+
+                    }
+
+                }
+
+
+                if (archivosAnteriores.length > 0) {
+
+                    const { error: errorEliminar } =
+                        await supabaseClient.storage
+                            .from(bucket)
+                            .remove(archivosAnteriores);
+
+
+                    if (errorEliminar) {
+
+                        console.error(
+                            'No se pudieron eliminar los archivos anteriores:',
+                            errorEliminar
+                        );
+
+                        showToast(
+                            'Registro guardado. No se pudieron eliminar algunos archivos anteriores.'
+                        );
+
+                    }
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    'Error al guardar catálogo Lystla:',
+                    error
+                );
+
+
+                /* =====================================
+                   10. LIMPIAR ARCHIVOS NUEVOS
+                   SI FALLA EL GUARDADO
+                ===================================== */
+
+                if (
+                    !guardadoCorrecto &&
+                    archivosNuevos.length > 0
+                ) {
+
+                    const { error: errorLimpieza } =
+                        await supabaseClient.storage
+                            .from(bucket)
+                            .remove(archivosNuevos);
+
+
+                    if (errorLimpieza) {
+
+                        console.error(
+                            'Error al limpiar archivos:',
+                            errorLimpieza
+                        );
+
+                    }
+
+                }
+
+
+                showToast(
+                    guardadoCorrecto
+                        ? 'Registro guardado. Revisa la actualización del panel.'
+                        : 'No fue posible guardar. Revisa la consola.'
+                );
+
+            } finally {
+
+                if (botonGuardar) {
+
+                    botonGuardar.disabled = false;
+
+                    botonGuardar.textContent = textoOriginal;
+
+                }
+
+            }
+
+        }
+
+
+
+        /* =========================================
+           46. ELIMINAR REGISTROS
+        ========================================= */
+
+        async function deleteRecord(type, id) {
+            const tables = {
+                service: ['lystla_services', 'lystla-services', 'services'],
+                product: ['lystla_products', 'lystla-products', 'products'],
+                promotion: ['lystla_promotions', 'lystla-promotions', 'promotions']
+            };
+            const config = tables[type];
+            if (!config) return;
+            if (type === 'service' && data.appointments.some(a => a.serviceId === id)) {
+                showToast('No puedes eliminar un servicio con citas registradas.');
+                return;
+            }
+            if (!confirm('¿Eliminar definitivamente este registro de Supabase?')) return;
+
+            const [table, bucket, collection] = config;
+            const record = data[collection].find(item => item.id === id);
+            try {
+                const { data: deleted, error } = await supabaseClient
+                    .from(table).delete().eq('id', id).select('id');
+                if (error) throw error;
+                if (!deleted || deleted.length === 0) {
+                    throw new Error('Supabase no autorizó la eliminación. Revisa las políticas RLS de DELETE.');
+                }
+                data[collection] = data[collection].filter(item => item.id !== id);
+                saveData();
+                const media = [record?.image_url, record?.video_url].filter(Boolean);
+                const paths = media.flatMap(url => {
+                    const prefix = `/storage/v1/object/public/${bucket}/`;
+                    const index = url.indexOf(prefix);
+                    return index < 0 ? [] : [decodeURIComponent(url.slice(index + prefix.length).split('?')[0])];
+                });
+                if (paths.length) {
+                    const { error: storageError } = await supabaseClient.storage.from(bucket).remove(paths);
+                    if (storageError) {
+                        console.warn('Registro eliminado; archivos pendientes de limpiar:', storageError);
+                        showToast('Registro eliminado; no se pudieron borrar todos sus archivos.');
+                        return;
+                    }
+                }
+                showToast('Registro eliminado definitivamente.');
+            } catch (error) {
+                console.error('No se pudo eliminar en Supabase:', error);
+                alert('No se pudo eliminar: ' + (error.message || error));
+            }
+        }
+
+
+        /* =========================================
+           47. GUARDAR CONFIGURACIÓN
+        ========================================= */
+
+        function saveSettings(event) {
+
+            event.preventDefault();
+
+
+            const open = $('setting-open').value;
+
+            const close = $('setting-close').value;
+
+
+            if (
+                !open ||
+                !close ||
+                open >= close
+            ) {
+
+                showToast(
+                    'Revisa el horario de apertura y cierre.'
+                );
+
+                return;
+
+            }
+
+
+            data.settings = {
+
+                phone: $('setting-phone').value.trim(),
+
+                open: open,
+
+                close: close,
+
+                reminders: $('setting-reminders')
+                    .value
+                    .trim()
+
+            };
+
+
+            if (saveData()) {
+
+                showToast(
+                    'Configuración guardada localmente.'
+                );
+
+            }
+
+        }
+
+
+        /* =========================================
+           48. EVENTOS DE NAVEGACIÓN
+        ========================================= */
+
+        document.querySelectorAll(
+            '[data-tab]'
+        ).forEach((button) => {
+
+            button.addEventListener('click', () => {
+
+                showTab(button.dataset.tab);
+
+            });
+
+        });
+
+
+        /* =========================================
+           49. EVENTOS DE BOTONES
+        ========================================= */
+
+        document.addEventListener('click', (event) => {
+
+            const newButton = event.target.closest(
+                '[data-new]'
+            );
+
+
+            if (newButton) {
+
+                openEditor(
+                    newButton.dataset.new
+                );
+
+                return;
+
+            }
+
+
+            const editButton = event.target.closest(
+                '[data-edit-type]'
+            );
+
+
+            if (editButton) {
+
+                openEditor(
+                    editButton.dataset.editType,
+                    editButton.dataset.editId
+                );
+
+                return;
+
+            }
+
+
+            const deleteButton = event.target.closest(
+                '[data-delete-type]'
+            );
+
+
+            if (deleteButton) {
+
+                deleteRecord(
+                    deleteButton.dataset.deleteType,
+                    deleteButton.dataset.deleteId
+                );
+
+            }
+
+        });
+
+
+        /* =========================================
+           50. EVENTOS DE FORMULARIOS
+        ========================================= */
+
+        $('editor-form').addEventListener(
+            'submit',
+            saveEditor
+        );
+
+
+        $('settings-form').addEventListener(
+            'submit',
+            saveSettings
+        );
+
+
+        $('agenda-date').addEventListener(
+            'change',
+            () => {
+
+                renderAppointmentList(
+                    'agenda-list',
+                    $('agenda-date').value
+                );
+
+            }
+        );
+
+
+        /* =========================================
+           51. CERRAR VENTANAS
+        ========================================= */
+
+        $('close-editor').onclick = closeEditor;
+
+        $('cancel-editor').onclick = closeEditor;
+
+
+        $('editor-modal').addEventListener(
+            'click',
+            (event) => {
+
+                if (event.target.id === 'editor-modal') {
+
+                    closeEditor();
+
+                }
+
+            }
+        );
+
+
+        document.addEventListener(
+            'keydown',
+            (event) => {
+
+                if (event.key === 'Escape') {
+
+                    closeEditor();
+
+                }
+
+            }
+        );
+
+
+        /* =========================================
+           52. INICIAR PANEL
+        ========================================= */
+
+        $('agenda-date').value = todayISO();
+
+        renderAll();
+
+        showTab('dashboard');
+
+        /* =========================================
+           53. SUPABASE - CONEXIÓN Y ACCESO
+        ========================================= */
+
+        const SUPABASE_URL =
+            'https://nwbkczxzgjsdwdnnizao.supabase.co';
+
+        const SUPABASE_ANON_KEY =
+            'sb_publishable_kIATMLB1KuEd9wpMT2eFDA_Z5w0uWen';
+
+        const supabaseClient = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_ANON_KEY
+        );
+
+        
+        /* =========================================
+           54. SUPABASE - CARGAR PROMOCIONES
+        ========================================= */
+
+        async function cargarPromocionesSupabase() {
+
+            try {
+
+                const { data: promociones, error } =
+                    await supabaseClient
+                        .from('lystla_promotions')
+                        .select('*')
+                        .order('created_at', {
+                            ascending: false
+                        });
+
+                if (error) {
+
+                    console.error(
+                        'Error al cargar promociones:',
+                        error
+                    );
+
+                    showToast(
+                        'No fue posible cargar las promociones.'
+                    );
+
+                    return false;
+
+                }
+
+                data.promotions = (promociones || []).map(
+                    (promocion) => {
+
+                        return {
+
+                            id: promocion.id,
+
+                            title: promocion.title,
+
+                            description:
+                                promocion.description || '',
+
+                            promotional_price:
+                                promocion.promotional_price,
+
+                            image_url:
+                                promocion.image_url || '',
+
+                            start:
+                                promocion.start_date,
+
+                            end:
+                                promocion.end_date,
+
+                            active:
+                                promocion.active
+
+                        };
+
+                    }
+                );
+
+                renderPromotions();
+
+                renderSummary();
+
+                return true;
+
+            } catch (error) {
+
+                console.error(
+                    'Error de conexión con promociones:',
+                    error
+                );
+
+                showToast(
+                    'Error de conexión con promociones.'
+                );
+
+                return false;
+
+            }
+
+        }
+
+
+        let sessionCheck = 0;
+
+        function showLogin(message = 'Inicia sesión para continuar.') {
+
+            $('admin-shell').hidden = true;
+            $('login-screen').hidden = false;
+            $('login-message').textContent = message;
+            $('login-form').hidden = false;
+
+        }
+
+        function showProtectedAdmin() {
+
+            $('login-screen').hidden = true;
+            $('admin-shell').hidden = false;
+
+        }
+
+        async function checkAdminSession() {
+
+            const checkId = ++sessionCheck;
+
+            $('admin-shell').hidden = true;
+            $('login-screen').hidden = false;
+            $('login-form').hidden = true;
+            $('login-message').textContent = 'Verificando permisos...';
+
+            try {
+
+                const { data: userData, error: userError } =
+                    await supabaseClient.auth.getUser();
+
+                if (checkId !== sessionCheck) {
+                    return;
+                }
+
+                if (userError || !userData.user) {
+                    showLogin();
+                    return;
+                }
+
+                const { data: admin, error: adminError } =
+                    await supabaseClient
+                        .from('lystla_admins')
+                        .select('user_id, full_name, role, active')
+                        .eq('user_id', userData.user.id)
+                        .eq('active', true)
+                        .maybeSingle();
+
+                if (checkId !== sessionCheck) {
+                    return;
+                }
+
+                if (adminError) {
+                    showLogin('No fue posible verificar permisos. Intenta nuevamente.');
+                    return;
+                }
+
+                if (!admin || !['owner', 'admin'].includes(admin.role)) {
+                    await supabaseClient.auth.signOut();
+                    showLogin('Esta cuenta no tiene autorización administrativa.');
+                    return;
+                }
+
+                       showProtectedAdmin();
+
+        await cargarPromocionesSupabase();
+
+        await cargarCatalogoSupabase();
+
+            } catch (error) {
+
+                if (checkId === sessionCheck) {
+                    showLogin('Error de conexión. Revisa internet e intenta nuevamente.');
+                }
+
+            }
+
+        }
+
+        $('login-form').addEventListener('submit', async (event) => {
+
+            event.preventDefault();
+
+            const button = $('login-submit');
+            const errorLabel = $('login-error');
+
+            button.disabled = true;
+            errorLabel.hidden = true;
+
+            const email = $('login-email').value.trim();
+            const password = $('login-password').value;
+
+            try {
+
+                const { error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    errorLabel.textContent = 'No fue posible iniciar sesión. Revisa tus datos.';
+                    errorLabel.hidden = false;
+                    return;
+                }
+
+                $('login-password').value = '';
+                await checkAdminSession();
+
+            } catch (error) {
+
+                errorLabel.textContent = 'Error de conexión con Supabase.';
+                errorLabel.hidden = false;
+
+            } finally {
+
+                button.disabled = false;
+
+            }
+
+        });
+
+        $('logout-button').addEventListener('click', async () => {
+
+            ++sessionCheck;
+            $('admin-shell').hidden = true;
+
+            await supabaseClient.auth.signOut();
+
+            showLogin('Sesión cerrada.');
+
+        });
+
+        supabaseClient.auth.onAuthStateChange((event) => {
+
+            if (event === 'SIGNED_OUT') {
+                ++sessionCheck;
+                showLogin();
+            }
+
+        });
+
+        
+        /* =========================================
+           55. SUPABASE - GUARDAR PROMOCIONES
+        ========================================= */
+
+        async function guardarPromocionSupabase() {
+
+            const botonGuardar = document.querySelector(
+                '#editor-form button[type="submit"]'
+            );
+
+            const textoOriginal = botonGuardar.textContent;
+
+            let rutaImagenNueva = null;
+
+            let registroGuardado = false;
+
+            botonGuardar.disabled = true;
+
+            botonGuardar.textContent = 'Guardando...';
+
+
+            try {
+
+                /* =====================================
+                   01. OBTENER DATOS DEL FORMULARIO
+                ===================================== */
+
+                const formulario = $('editor-form');
+
+                const titulo = formulario.elements[
+                    'title'
+                ].value.trim();
+
+                const descripcion = formulario.elements[
+                    'description'
+                ].value.trim();
+
+                const precioTexto = formulario.elements[
+                    'promotional_price'
+                ].value.trim();
+
+                const inicio = formulario.elements[
+                    'start'
+                ].value;
+
+                const fin = formulario.elements[
+                    'end'
+                ].value;
+
+                const activa = formulario.elements[
+                    'active'
+                ].value === 'true';
+
+                const archivo = formulario.elements[
+                    'promotion_image'
+                ].files[0];
+
+
+                /* =====================================
+                   02. VALIDAR INFORMACIÓN
+                ===================================== */
+
+                if (
+                    !titulo ||
+                    !inicio ||
+                    !fin ||
+                    fin < inicio
+                ) {
+
+                    showToast(
+                        'Revisa el título y las fechas.'
+                    );
+
+                    return;
+
+                }
+
+
+                const precio = precioTexto === ''
+                    ? null
+                    : Number(precioTexto);
+
+
+                if (
+                    precio !== null &&
+                    (
+                        !Number.isFinite(precio) ||
+                        precio < 0
+                    )
+                ) {
+
+                    showToast(
+                        'El precio promocional no es válido.'
+                    );
+
+                    return;
+
+                }
+
+
+                /* =====================================
+                   03. VALIDAR FOTOGRAFÍA
+                ===================================== */
+
+                if (archivo) {
+
+                    const formatosPermitidos = [
+                        'image/jpeg',
+                        'image/png',
+                        'image/webp'
+                    ];
+
+                    if (
+                        !formatosPermitidos.includes(
+                            archivo.type
+                        )
+                    ) {
+
+                        showToast(
+                            'Utiliza una fotografía JPG, PNG o WEBP.'
+                        );
+
+                        return;
+
+                    }
+
+
+                    if (
+                        archivo.size > 5 * 1024 * 1024
+                    ) {
+
+                        showToast(
+                            'La fotografía supera los 5 MB.'
+                        );
+
+                        return;
+
+                    }
+
+                }
+
+
+                /* =====================================
+                   04. CONSULTAR PROMOCIÓN ANTERIOR
+                ===================================== */
+
+                const promocionAnterior = data.promotions.find(
+                    (promocion) => {
+
+                        return promocion.id === editorId;
+
+                    }
+                );
+
+                let imagenURL =
+                    promocionAnterior?.image_url || null;
+
+
+                /* =====================================
+                   05. SUBIR NUEVA FOTOGRAFÍA
+                ===================================== */
+
+                if (archivo) {
+
+                    const extensiones = {
+                        'image/jpeg': 'jpg',
+                        'image/png': 'png',
+                        'image/webp': 'webp'
+                    };
+
+                    const extension = extensiones[
+                        archivo.type
+                    ];
+
+                    const nombreArchivo =
+                        `${crypto.randomUUID()}.${extension}`;
+
+                    rutaImagenNueva = nombreArchivo;
+
+
+                    const { error: errorImagen } =
+                        await supabaseClient.storage
+                            .from('lystla-promotions')
+                            .upload(
+                                rutaImagenNueva,
+                                archivo,
+                                {
+                                    contentType: archivo.type,
+                                    upsert: false
+                                }
+                            );
+
+
+                    if (errorImagen) {
+
+                        throw errorImagen;
+
+                    }
+
+
+                    const { data: imagenPublica } =
+                        supabaseClient.storage
+                            .from('lystla-promotions')
+                            .getPublicUrl(
+                                rutaImagenNueva
+                            );
+
+
+                    imagenURL = imagenPublica.publicUrl;
+
+                }
+
+
+                /* =====================================
+                   06. PREPARAR REGISTRO
+                ===================================== */
+
+                const registro = {
+
+                    title: titulo,
+
+                    description: descripcion,
+
+                    promotional_price: precio,
+
+                    image_url: imagenURL,
+
+                    start_date: inicio,
+
+                    end_date: fin,
+
+                    active: activa
+
+                };
+
+
+                /* =====================================
+                   07. GUARDAR EN SUPABASE
+                ===================================== */
+
+                let resultado;
+
+
+                if (editorId) {
+
+                    resultado = await supabaseClient
+                        .from('lystla_promotions')
+                        .update(registro)
+                        .eq('id', editorId)
+                        .select('id')
+                        .single();
+
+                } else {
+
+                    resultado = await supabaseClient
+                        .from('lystla_promotions')
+                        .insert(registro)
+                        .select('id')
+                        .single();
+
+                }
+
+
+                if (resultado.error) {
+
+                    throw resultado.error;
+
+                }
+
+
+                registroGuardado = true;
+
+
+                /* =====================================
+                   08. ACTUALIZAR PANEL
+                ===================================== */
+
+                closeEditor();
+
+                const cargaCorrecta =
+                    await cargarPromocionesSupabase();
+
+
+                if (cargaCorrecta) {
+
+                    showToast(
+                        'Promoción guardada en Supabase.'
+                    );
+
+                } else {
+
+                    showToast(
+                        'Promoción guardada. Actualiza la lista.'
+                    );
+
+                }
+
+
+                /* =====================================
+                   09. ELIMINAR FOTOGRAFÍA REEMPLAZADA
+                ===================================== */
+
+                if (
+                    archivo &&
+                    promocionAnterior?.image_url &&
+                    promocionAnterior.image_url !== imagenURL
+                ) {
+
+                    const urlAnterior =
+                        promocionAnterior.image_url;
+
+                    const marcador =
+                        '/storage/v1/object/public/lystla-promotions/';
+
+
+                    if (urlAnterior.includes(marcador)) {
+
+                        const rutaAnterior = decodeURIComponent(
+                            urlAnterior
+                                .split(marcador)[1]
+                                .split('?')[0]
+                        );
+
+
+                        const { error: errorEliminar } =
+                            await supabaseClient.storage
+                                .from('lystla-promotions')
+                                .remove([
+                                    rutaAnterior
+                                ]);
+
+
+                        if (errorEliminar) {
+
+                            console.error(
+                                'Error al eliminar fotografía anterior:',
+                                errorEliminar
+                            );
+
+                            showToast(
+                                'Promoción guardada. No se pudo eliminar la fotografía anterior.'
+                            );
+
+                        }
+
+                    }
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    'Error al guardar promoción:',
+                    error
+                );
+
+
+                /* =====================================
+                   10. LIMPIAR FOTO SI FALLÓ GUARDADO
+                ===================================== */
+
+                if (
+                    rutaImagenNueva &&
+                    !registroGuardado
+                ) {
+
+                    const { error: errorLimpieza } =
+                        await supabaseClient.storage
+                            .from('lystla-promotions')
+                            .remove([
+                                rutaImagenNueva
+                            ]);
+
+
+                    if (errorLimpieza) {
+
+                        console.error(
+                            'No se pudo limpiar la fotografía:',
+                            errorLimpieza
+                        );
+
+                    }
+
+                }
+
+
+                if (registroGuardado) {
+
+                    showToast(
+                        'Promoción guardada. Revisa la actualización del panel.'
+                    );
+
+                } else {
+
+                    showToast(
+                        'No fue posible guardar la promoción.'
+                    );
+
+                }
+
+            } finally {
+
+                botonGuardar.disabled = false;
+
+                botonGuardar.textContent = textoOriginal;
+
+            }
+
+        }
+
+       
+        /* =========================================
+           56. CARGAR SERVICIOS Y PRODUCTOS
+               DESDE SUPABASE
+        ========================================= */
+
+        async function cargarCatalogoSupabase() {
+
+            try {
+
+                /* =====================================
+                   01. CONSULTAR SERVICIOS
+                ===================================== */
+
+                const resultadoServicios =
+                    await supabaseClient
+                        .from('lystla_services')
+                        .select('*')
+                        .order('created_at', {
+                            ascending: false
+                        });
+
+
+                if (resultadoServicios.error) {
+
+                    throw resultadoServicios.error;
+
+                }
+
+
+                /* =====================================
+                   02. CONSULTAR PRODUCTOS
+                ===================================== */
+
+                const resultadoProductos =
+                    await supabaseClient
+                        .from('lystla_products')
+                        .select('*')
+                        .order('created_at', {
+                            ascending: false
+                        });
+
+
+                if (resultadoProductos.error) {
+
+                    throw resultadoProductos.error;
+
+                }
+
+
+                /* =====================================
+                   03. PREPARAR SERVICIOS
+                ===================================== */
+
+                data.services = (
+                    resultadoServicios.data || []
+                ).map((servicio) => {
+
+                    return {
+
+                        id: servicio.id,
+
+                        name: servicio.name,
+
+                        description:
+                            servicio.description || '',
+
+                        price: Number(
+                            servicio.price
+                        ),
+
+                        duration:
+                            servicio.duration,
+
+                        image_url:
+                            servicio.image_url || '',
+
+                        video_url:
+                            servicio.video_url || '',
+                        video_filter:
+                            normalizarFiltroVideo(servicio.video_filter),
+
+                        active:
+                            servicio.active !== false
+
+                    };
+
+                });
+
+
+                /* =====================================
+                   04. PREPARAR PRODUCTOS
+                ===================================== */
+
+                data.products = (
+                    resultadoProductos.data || []
+                ).map((producto) => {
+
+                    return {
+
+                        id: producto.id,
+
+                        name: producto.name,
+
+                        description:
+                            producto.description || '',
+
+                        price: Number(
+                            producto.price
+                        ),
+
+                        stock:
+                            producto.stock,
+
+                        image_url:
+                            producto.image_url || '',
+
+                        video_url:
+                            producto.video_url || '',
+                        video_filter:
+                            normalizarFiltroVideo(producto.video_filter),
+
+                        active:
+                            producto.active !== false
+
+                    };
+
+                });
+
+
+                /* =====================================
+                   05. ACTUALIZAR ADMINISTRADOR
+                ===================================== */
+
+                renderServices();
+
+                renderProducts();
+
+                renderSummary();
+
+
+                console.log(
+                    'Servicios cargados:',
+                    data.services.length
+                );
+
+                console.log(
+                    'Productos cargados:',
+                    data.products.length
+                );
+
+
+                return true;
+
+            } catch (error) {
+
+                console.error(
+                    'Error al cargar catálogo de Lystla:',
+                    error
+                );
+
+                showToast(
+                    'No fue posible cargar servicios y productos.'
+                );
+
+
+                return false;
+
+            }
+
+        }
+ 
+    
+
+        checkAdminSession();
+
+    </script>
+
+</body>
+
+</html>
